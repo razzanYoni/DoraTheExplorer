@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ewzXvpzLUqVSgyhe6xL13R5tuOdl7xR410gY+vMQCs4qGcpPdxyUZNvtcAlnadF12lHP/qg4CmMMiAExQwyzPQ==",
+  "dgSpecHash": "ybKLoX78uAWR3/WsnDZAxyN5jkWqLGyqVhyAjVBabmZ+X3AP1g98R7J0Y3Y1kYpFNxOd6lCL9nfNOYMW15HcIA==",
   "success": true,
-  "projectFilePath": "D:\\Informatika\\Kuliah\\IF\\SMT 4\\Stima\\Tubes\\Tubes 2\\3\\MyApp.csproj",
+  "projectFilePath": "D:\\Informatika\\Kuliah\\IF\\SMT 4\\Stima\\Tubes\\Tubes 2\\Avalonia\\DoraTheExplorer\\DoraTheExplorer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ASUS\\.nuget\\packages\\avalonia\\0.10.18\\avalonia.0.10.18.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\avalonia.angle.windows.natives\\2.1.0.2020091801\\avalonia.angle.windows.natives.2.1.0.2020091801.nupkg.sha512",
@@ -21,7 +21,6 @@
     "C:\\Users\\ASUS\\.nuget\\packages\\harfbuzzsharp.nativeassets.webassembly\\2.8.2.1-preview.108\\harfbuzzsharp.nativeassets.webassembly.2.8.2.1-preview.108.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\harfbuzzsharp.nativeassets.win32\\2.8.2.1-preview.108\\harfbuzzsharp.nativeassets.win32.2.8.2.1-preview.108.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\jetbrains.annotations\\10.3.0\\jetbrains.annotations.10.3.0.nupkg.sha512",
-    "C:\\Users\\ASUS\\.nuget\\packages\\jp2masa.avalonia.flexbox\\0.2.0\\jp2masa.avalonia.flexbox.0.2.0.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\microsoft.codeanalysis.analyzers\\2.9.6\\microsoft.codeanalysis.analyzers.2.9.6.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\microsoft.codeanalysis.common\\3.4.0\\microsoft.codeanalysis.common.3.4.0.nupkg.sha512",
     "C:\\Users\\ASUS\\.nuget\\packages\\microsoft.codeanalysis.csharp\\3.4.0\\microsoft.codeanalysis.csharp.3.4.0.nupkg.sha512",

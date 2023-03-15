@@ -1,7 +1,7 @@
 {
   "version": 3,
   "targets": {
-    "net7.0": {
+    "net6.0": {
       "Avalonia/0.10.18": {
         "type": "package",
         "dependencies": {
@@ -428,18 +428,6 @@
           "lib/netstandard1.0/JetBrains.Annotations.dll": {
             "related": ".xml"
           }
-        }
-      },
-      "jp2masa.Avalonia.Flexbox/0.2.0": {
-        "type": "package",
-        "dependencies": {
-          "Avalonia": "0.10.0"
-        },
-        "compile": {
-          "lib/netstandard2.0/Avalonia.Flexbox.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.0/Avalonia.Flexbox.dll": {}
         }
       },
       "Microsoft.CodeAnalysis.Analyzers/2.9.6": {
@@ -1852,19 +1840,6 @@
         "lib/portable-net4+sl4+wp7+netcore45/JetBrains.Annotations.xml",
         "lib/portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/JetBrains.Annotations.dll",
         "lib/portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/JetBrains.Annotations.xml"
-      ]
-    },
-    "jp2masa.Avalonia.Flexbox/0.2.0": {
-      "sha512": "uZ9i/eqTpElDX7O/4WNp5zBSW2IvArfvfx0fj4K0xm7Yxe0P6upJuaalqmPCZkxM8xUYYOV2oDpxyUaQbd8adQ==",
-      "type": "package",
-      "path": "jp2masa.avalonia.flexbox/0.2.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "jp2masa.avalonia.flexbox.0.2.0.nupkg.sha512",
-        "jp2masa.avalonia.flexbox.nuspec",
-        "lib/netstandard2.0/Avalonia.Flexbox.dll"
       ]
     },
     "Microsoft.CodeAnalysis.Analyzers/2.9.6": {
@@ -4387,12 +4362,11 @@
     }
   },
   "projectFileDependencyGroups": {
-    "net7.0": [
+    "net6.0": [
       "Avalonia >= 0.10.18",
       "Avalonia.Desktop >= 0.10.18",
       "Avalonia.Diagnostics >= 0.10.18",
-      "XamlNameReferenceGenerator >= 1.6.1",
-      "jp2masa.Avalonia.Flexbox >= 0.2.0"
+      "XamlNameReferenceGenerator >= 1.6.1"
     ]
   },
   "packageFolders": {
@@ -4401,26 +4375,26 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Informatika\\Kuliah\\IF\\SMT 4\\Stima\\Tubes\\Tubes 2\\3\\MyApp.csproj",
-      "projectName": "MyApp",
-      "projectPath": "D:\\Informatika\\Kuliah\\IF\\SMT 4\\Stima\\Tubes\\Tubes 2\\3\\MyApp.csproj",
+      "projectUniqueName": "D:\\Informatika\\Kuliah\\IF\\SMT 4\\Stima\\Tubes\\Tubes 2\\Avalonia\\DoraTheExplorer\\DoraTheExplorer.csproj",
+      "projectName": "DoraTheExplorer",
+      "projectPath": "D:\\Informatika\\Kuliah\\IF\\SMT 4\\Stima\\Tubes\\Tubes 2\\Avalonia\\DoraTheExplorer\\DoraTheExplorer.csproj",
       "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-      "outputPath": "D:\\Informatika\\Kuliah\\IF\\SMT 4\\Stima\\Tubes\\Tubes 2\\3\\obj\\",
+      "outputPath": "D:\\Informatika\\Kuliah\\IF\\SMT 4\\Stima\\Tubes\\Tubes 2\\Avalonia\\DoraTheExplorer\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
-        "net7.0"
+        "net6.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net7.0": {
-          "targetAlias": "net7.0",
+        "net6.0": {
+          "targetAlias": "net6.0",
           "projectReferences": {}
         }
       },
@@ -4431,8 +4405,8 @@
       }
     },
     "frameworks": {
-      "net7.0": {
-        "targetAlias": "net7.0",
+      "net6.0": {
+        "targetAlias": "net6.0",
         "dependencies": {
           "Avalonia": {
             "target": "Package",
@@ -4449,10 +4423,6 @@
           "XamlNameReferenceGenerator": {
             "target": "Package",
             "version": "[1.6.1, )"
-          },
-          "jp2masa.Avalonia.Flexbox": {
-            "target": "Package",
-            "version": "[0.2.0, )"
           }
         },
         "imports": [
