@@ -9,8 +9,13 @@ Dalam tugas besar ini, Anda akan diminta untuk membangun sebuah aplikasi dengan 
 ## Installation
 Clone the repo
 ```sh
-git clone https://github.com/your_username_/Project-Name.git
+git clone https://github.com/razzanYoni/Tubes2_DoraTheExplorer.git
 ```
+Switch to AvaloniaUI branch
+```sh
+git switch avaloniaUI
+```
+
 ## Usage
 ```sh
 dotnet run
