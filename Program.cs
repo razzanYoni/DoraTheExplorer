@@ -19,7 +19,7 @@ class Program
     //         .UsePlatformDetect()
     //         .LogToTrace();
 
-    class Coordinate : IEquatable<Coordinate>
+    readonly struct Coordinate : IEquatable<Coordinate>
     {
         public readonly int x;
         public readonly int y;
@@ -30,9 +30,9 @@ class Program
             this.y = y;
         }
 
-        public bool Equals(Coordinate? other)
+        public bool Equals(Coordinate other)
         {
-            return other is not null && x == other.x && y == other.y;
+            return this.x == other.x && this.y == other.y;
         }
 
         public override string ToString()
@@ -73,6 +73,6 @@ class Program
                 }
             }
         }
-        Solver.BFS<Coordinate>(g, new Coordinate(4, 4));
+        Solver.BFS<Coordinate>(g, new Coordinate(1, 2));
     }
 }
