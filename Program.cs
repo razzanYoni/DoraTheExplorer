@@ -32,7 +32,7 @@ class Program
 
         public bool Equals(Coordinate? other)
         {
-            return other != null && x == other.x && y == other.y;
+            return other is not null && x == other.x && y == other.y;
         }
 
         public override string ToString()
@@ -63,18 +63,16 @@ class Program
                     vertices[i, j] = new Vertex<Coordinate>(new Coordinate(i, j));
                     if (j - 1 >= 0 && grid[i, j - 1] == 1) // left
                     {
-                        vertices[i, j].Left = vertices[i, j - 1];
-                        vertices[i, j - 1].Right = vertices[i, j];
+                        vertices[i, j].ConnectLeft(vertices[i, j - 1]);
                     }
-                    if (i - 1 >= 0 && grid[i - 1, j] == 1) // top
+                    if (i - 1 >= 0 && grid[i - 1, j] == 1) // up
                     {
-                        vertices[i, j].Top = vertices[i - 1, j];
-                        vertices[i - 1, j].Down = vertices[i, j];
+                        vertices[i, j].ConnectUp(vertices[i - 1, j]);
                     }
                     g.AddVertex(vertices[i, j]);
                 }
             }
         }
-        Solver.BFS<Coordinate>(g, new Coordinate(2, 1));
+        Solver.BFS<Coordinate>(g, new Coordinate(4, 4));
     }
 }

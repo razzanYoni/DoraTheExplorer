@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DoraTheExplorer
 {
@@ -10,22 +11,51 @@ namespace DoraTheExplorer
             private static int id = 0;
             public readonly int Id;
             public T Info;
-            public Vertex<T>? Left;
-            public Vertex<T>? Top;
-            public Vertex<T>? Right;
-            public Vertex<T>? Down;
+            private Vertex<T>? left;
+            private Vertex<T>? up;
+            private Vertex<T>? right;
+            private Vertex<T>? down;
 
             public Vertex(T info)
             {
-                Info = info;
-                Id = id;
+                this.Info = info;
+                this.Id = id;
                 id++;
+            }
+
+            public Vertex<T>? Left { get => left; }
+            public Vertex<T>? Right { get => right; }
+            public Vertex<T>? Up { get => up; }
+            public Vertex<T>? Down { get => down; }
+
+            public void ConnectLeft(Vertex<T> left)
+            {
+                this.left = left;
+                left.right = this;
+            }
+
+            public void ConnectRight(Vertex<T> right)
+            {
+                this.right = right;
+                right.left = this;
+            }
+
+            public void ConnectUp(Vertex<T> up)
+            {
+                this.up = up;
+                up.down = this;
+            }
+
+            public void ConnectDown(Vertex<T> down)
+            {
+                this.down = down;
+                down.up = this;
             }
         }
         public class Graph<T> where T : notnull
         {
             private LinkedList<Vertex<T>> vertices;
-            public Vertex<T>[] Vertices { get => GetVertices(); }
+            public Vertex<T>[] Vertices { get => vertices.ToArray(); }
 
             public Graph()
             {
@@ -38,18 +68,6 @@ namespace DoraTheExplorer
                 {
                     vertices.AddLast(vert);
                 }
-            }
-
-            public Vertex<T>[] GetVertices()
-            {
-                Vertex<T>[] arr = new Vertex<T>[vertices.Count];
-                int i = 0;
-                foreach (var v in vertices)
-                {
-                    arr[i] = v;
-                    i++;
-                }
-                return arr;
             }
         }
     }
