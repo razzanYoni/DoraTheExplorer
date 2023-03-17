@@ -3,10 +3,14 @@ using System.Linq;
 
 namespace DoraTheExplorer.Structure;
 
-public class Graph<T> where T : notnull
+public class Graph<T>
+    where T : notnull
 {
     private LinkedList<Vertex<T>> vertices;
-    public Vertex<T>[] Vertices { get => vertices.ToArray(); }
+    public Vertex<T>[] Vertices
+    {
+        get => vertices.ToArray();
+    }
 
     public Graph()
     {
