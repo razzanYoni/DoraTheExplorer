@@ -1,6 +1,7 @@
 ﻿namespace DoraTheExplorer.Structure;
 
-public class Vertex<T> where T : notnull
+public class Vertex<T>
+    where T : notnull
 {
     private static int id = 0;
     public readonly int Id;
@@ -17,10 +18,22 @@ public class Vertex<T> where T : notnull
         id++;
     }
 
-    public Vertex<T>? Left { get => left; }
-    public Vertex<T>? Right { get => right; }
-    public Vertex<T>? Up { get => up; }
-    public Vertex<T>? Down { get => down; }
+    public Vertex<T>? Left
+    {
+        get => left;
+    }
+    public Vertex<T>? Right
+    {
+        get => right;
+    }
+    public Vertex<T>? Up
+    {
+        get => up;
+    }
+    public Vertex<T>? Down
+    {
+        get => down;
+    }
 
     public void ConnectLeft(Vertex<T> left)
     {

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DoraTheExplorer.Structure;
 
@@ -6,19 +7,26 @@ public struct State
 {
     private HashSet<Coordinate> visitedLocations;
     private HashSet<Coordinate> backtrackLocations;
-    private readonly Coordinate currentLocation;
-    public readonly int Step;
+    public Coordinate CurrentLocation;
+    public int Step;
 
-    public Coordinate CurrentLocation => currentLocation;
     public Coordinate[] VisitedLocations => GetVisitedLocations();
     public Coordinate[] BacktrackLocations => GetBacktrackLocations();
 
     public State(Coordinate currentLocation, int step)
     {
-        this.currentLocation = currentLocation;
+        this.CurrentLocation = currentLocation;
         backtrackLocations = new HashSet<Coordinate>();
         visitedLocations = new HashSet<Coordinate>();
         this.Step = step;
+    }
+
+    public State(State other)
+    {
+        this.CurrentLocation = other.CurrentLocation;
+        this.Step = other.Step;
+        this.visitedLocations = new HashSet<Coordinate>(other.visitedLocations);
+        this.backtrackLocations = new HashSet<Coordinate>(other.backtrackLocations);
     }
 
     public void AddVisitedLocation(Coordinate coordinate)
@@ -40,8 +48,8 @@ public struct State
 
     public Coordinate[] GetBacktrackLocations()
     {
-        Coordinate[] coords = new Coordinate[visitedLocations.Count];
-        visitedLocations.CopyTo(coords);
+        Coordinate[] coords = new Coordinate[backtrackLocations.Count];
+        backtrackLocations.CopyTo(coords);
         return coords;
     }
 }
