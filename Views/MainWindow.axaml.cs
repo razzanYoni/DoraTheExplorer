@@ -1,6 +1,9 @@
+using System;
 using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Interactivity;
 
-namespace DoraTheExplorer;
+namespace DoraTheExplorer.Views;
 
 public partial class MainWindow : Window
 {

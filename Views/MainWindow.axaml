@@ -1,13 +1,21 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:vm="using:DoraTheExplorer.ViewModels"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="1024"
 		Width="1000" Height="711"
-        x:Class="DoraTheExplorer.MainWindow"
+        x:Class="DoraTheExplorer.Views.MainWindow"
+		x:DataType="vm:MainWindowViewModel"
         Title="Dora The Explorer">
+	<!-- Icon="/Assets/mandalorian-logo.ico" -->
 
 	<!-- TODO : Atur Font Size biar relative, Binding Matrix dan Slider, Color Palette-->
+	
+	<Design.DataContext>
+		<vm:MainWindowViewModel/>
+	</Design.DataContext>
+	
 	
 	<Window.Styles>
 		<!-- Input File Button (Hover) -->
@@ -27,6 +35,14 @@
 			<Setter
 				Property="TextBox.Foreground"
 				Value="Yellow">
+			</Setter>
+		</Style>
+		
+		<!-- Default BFS : Checked -->
+		<Style Selector="RadioButton#BfsRadioButton">
+			<Setter
+				Property="IsChecked"
+				Value="True">
 			</Setter>
 		</Style>
 	</Window.Styles>
@@ -212,6 +228,8 @@
 						Grid.Column="0" 
 						GroupName="Algorithm" 
 						Content="BFS" 
+						
+						Name="BfsRadioButton"
 						IsChecked="{Binding BFSChecked}">
 					</RadioButton>
 
@@ -239,10 +257,13 @@
 				VerticalAlignment="Center" 
 				HorizontalAlignment="Center" 
 				Foreground="White" 
-				Background="Black" 
+				Background="Black"
 				Content="Search"
-				>
-				<!--Command="{Binding Grid, ElementName=mazeVisulaization}"-->
+				
+			>
+				
+				<!-- Command="{Binding SearchResult}"
+				    Command="{Binding Grid, ElementName=mazeVisulaization}"-->
 			</Button>
 		</Grid>
 	</Grid>
