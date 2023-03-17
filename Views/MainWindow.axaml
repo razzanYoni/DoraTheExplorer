@@ -37,14 +37,6 @@
 				Value="Yellow">
 			</Setter>
 		</Style>
-		
-		<!-- Default BFS : Checked -->
-		<Style Selector="RadioButton#BfsRadioButton">
-			<Setter
-				Property="IsChecked"
-				Value="True">
-			</Setter>
-		</Style>
 	</Window.Styles>
 	
 	<!-- Parent -->
@@ -247,7 +239,8 @@
 				<CheckBox 
 					Grid.Row="2" 
 					Grid.Column="0" 
-					Content="TSP">
+					Content="TSP"
+					IsChecked="{Binding TSPChecked}">
 				</CheckBox>	
 			</Grid>
 			
