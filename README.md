@@ -11,10 +11,6 @@ Clone the repo
 ```sh
 git clone https://github.com/razzanYoni/Tubes2_DoraTheExplorer.git
 ```
-Switch to AvaloniaUI branch
-```sh
-git switch avaloniaUI
-```
 
 ## Usage
 ```sh
