@@ -9,7 +9,7 @@
         x:Class="DoraTheExplorer.Views.MainWindow"
 		x:DataType="vm:MainWindowViewModel"
         Title="Dora The Explorer">
-
+	
 	<!-- Icon="..\..\..\Assets\mandalorianlogo.ico" Logo tapi error-->
 	<!-- TODO : Atur Font Size biar relative, Binding Matrix dan Slider, Color Palette-->
 	
@@ -17,6 +17,13 @@
 		<vm:MainWindowViewModel/>
 	</Design.DataContext>
 	
+	<Window.Resources>
+		<ResourceDictionary>
+			<!--We set the XAML resource-->
+			<SolidColorBrush x:Key="StatusCell" 
+			                 Color="Green"/>
+		</ResourceDictionary>
+	</Window.Resources>
 	
 	<Window.Styles>
 		<!-- Input File Button (Hover) -->
@@ -99,12 +106,14 @@
 					Name="MazeVisualization">
 				</Grid> -->
 
-				<maze:MazeMatrix/>
+				<Grid 
+					Grid.Row="0"
+					x:Name="MazeGrid"
+					/>
 				
 				<!-- Slider -->
 				<Grid 
-					Grid.Row="1" 
-					Background="Green">
+					Grid.Row="1">
 					<Slider
 						x:Name="MazeSlider">
 					</Slider>
@@ -141,7 +150,7 @@
 					FontFamily="Comic Sans MS" 
 					HorizontalAlignment="Left" 
 					Margin="5"
-					Content="Nedes :">
+					x:Name="NodesLabel">
 				</Label>
 				
 				<!-- Route (FlexBox) -->
