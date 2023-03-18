@@ -3,6 +3,10 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using DoraTheExplorer.ViewModels;
 using DoraTheExplorer.Views;
+using System;
+using Avalonia.Platform;
+using System.Drawing.Imaging;
+using Avalonia.ReactiveUI;
 
 namespace DoraTheExplorer;
 
@@ -27,6 +31,13 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+        
+    //    LoadLogo();
     }
 
+    // public void LoadLogo()
+    // {
+    //    var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+    //    var logo = new System.Drawing.Icon(assets.Open(new Uri(@"avares://DoraTheExplorer/Assets/mandalorianlogo.ico")));
+    //}
 }

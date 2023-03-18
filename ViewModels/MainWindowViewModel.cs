@@ -1,8 +1,14 @@
-﻿namespace DoraTheExplorer.ViewModels;
+﻿// using DoraTheExplorer.Models;
+
+using Avalonia;
+using Avalonia.Interactivity;
+using System;
+using System.Reflection;
+using Avalonia.Controls;
+using DoraTheExplorer.Views;
+
+namespace DoraTheExplorer.ViewModels;
 
 public class MainWindowViewModel
 {
-    public string Greeting => "Welcome to Avalonia";
-    public bool BFSChecked => true;
-    public bool TSPChecked => true;
 }

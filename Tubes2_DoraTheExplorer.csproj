@@ -5,7 +5,24 @@
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\mandalorianlogo.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Util" />
+    <Folder Include="Views" />
+    <Folder Include="Algorithm" />
+    <Folder Include="DTO" />
+    <Folder Include="Models" />
+    <Folder Include="Result" />
+    <Folder Include="Structure" />
+    <Folder Include="ViewModels" />		
+    <AvaloniaResources Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\mandalorianlogo.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <TrimmerRootAssembly Include="Avalonia.Themes.Fluent" />

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33424.131
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoraTheExplorer", "DoraTheExplorer.csproj", "{AF58C91E-FAA0-480D-B215-337E31D6E0FE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF58C91E-FAA0-480D-B215-337E31D6E0FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF58C91E-FAA0-480D-B215-337E31D6E0FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF58C91E-FAA0-480D-B215-337E31D6E0FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF58C91E-FAA0-480D-B215-337E31D6E0FE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2C85BB2D-2001-43AC-BAE5-DC290E5500EC}
+	EndGlobalSection
+EndGlobal
