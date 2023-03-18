@@ -5,28 +5,25 @@ namespace DoraTheExplorer.Structure;
 
 public struct State
 {
-    private HashSet<Coordinate> visitedLocations;
-    private HashSet<Coordinate> backtrackLocations;
+    private List<Coordinate> visitedLocations;
+    private List<Coordinate> backtrackLocations;
     public Coordinate CurrentLocation;
-    public int Step;
 
-    public Coordinate[] VisitedLocations => GetVisitedLocations();
-    public Coordinate[] BacktrackLocations => GetBacktrackLocations();
+    public Coordinate[] VisitedLocations => visitedLocations.ToArray();
+    public Coordinate[] BacktrackLocations => backtrackLocations.ToArray();
 
-    public State(Coordinate currentLocation, int step)
+    public State(Coordinate currentLocation)
     {
         this.CurrentLocation = currentLocation;
-        backtrackLocations = new HashSet<Coordinate>();
-        visitedLocations = new HashSet<Coordinate>();
-        this.Step = step;
+        backtrackLocations = new List<Coordinate>();
+        visitedLocations = new List<Coordinate>();
     }
 
     public State(State other)
     {
         this.CurrentLocation = other.CurrentLocation;
-        this.Step = other.Step;
-        this.visitedLocations = new HashSet<Coordinate>(other.visitedLocations);
-        this.backtrackLocations = new HashSet<Coordinate>(other.backtrackLocations);
+        this.visitedLocations = new List<Coordinate>(other.visitedLocations);
+        this.backtrackLocations = new List<Coordinate>(other.backtrackLocations);
     }
 
     public void AddVisitedLocation(Coordinate coordinate)
@@ -39,17 +36,9 @@ public struct State
         backtrackLocations.Add(coordinate);
     }
 
-    public Coordinate[] GetVisitedLocations()
+    public void RemoveLatestVisitedLocation()
     {
-        Coordinate[] coords = new Coordinate[visitedLocations.Count];
-        visitedLocations.CopyTo(coords);
-        return coords;
+        visitedLocations.RemoveAt(visitedLocations.Count - 1);
     }
 
-    public Coordinate[] GetBacktrackLocations()
-    {
-        Coordinate[] coords = new Coordinate[backtrackLocations.Count];
-        backtrackLocations.CopyTo(coords);
-        return coords;
-    }
 }
