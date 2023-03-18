@@ -8,7 +8,6 @@ public class StateDTO
     public IList<CoordinateDTO>? VisitedLocations { get; set; }
     public IList<CoordinateDTO>? BacktrackLocations { get; set; }
     public CoordinateDTO CurrentLocation { get; set; }
-    public int Step { get; set; }
 
     public static StateDTO From(State state)
     {
@@ -24,7 +23,6 @@ public class StateDTO
             dto.BacktrackLocations.Add(CoordinateDTO.From(data));
         }
         dto.CurrentLocation = CoordinateDTO.From(state.CurrentLocation);
-        dto.Step = state.Step;
         return dto;
     }
 }

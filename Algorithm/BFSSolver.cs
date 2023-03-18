@@ -49,81 +49,116 @@ public class BFSSolver
         }
     }
 
-    public static (Queue<Coordinate>?, List<State>) FindPath(Graph<Coordinate> graph, Coordinate start, Coordinate goal)
+    public static (List<Coordinate>?, List<State>) FindPath(Graph<Coordinate> graph, State initialState, Coordinate[] goals)
+    {
+        var paths = new List<List<Coordinate>>();
+        var statesList = new List<List<State>>();
+        var goalSet = new List<Coordinate>(goals);
+        while (goalSet.Count > 0)
+        {
+            var shortestGoal = goalSet[0];
+            var (shortestPath, shortestStates) = FindPath(graph, new State(initialState), shortestGoal);
+            for (int i = 1; i < goalSet.Count; i++)
+            {
+                var goal = goalSet[i];
+                var (path, states) = FindPath(graph, new State(initialState), goal);
+                if (path?.Count < shortestPath?.Count)
+                {
+                    shortestPath = path;
+                    shortestStates = states;
+                    shortestGoal = goal;
+                }
+            }
+            if (shortestPath is not null) paths.Add(shortestPath);
+            statesList.Add(shortestStates);
+            initialState = new State(shortestStates.Last());
+            goalSet.Remove(shortestGoal);
+        }
+        var resPath = new List<Coordinate>(paths[0]);
+        var resStates = new List<State>(statesList[0]);
+        for (int i = 1; i < goals.Length; i++)
+        {
+            resPath.AddRange(paths[i].Skip(1));
+            resStates.AddRange(statesList[i].Skip(1));
+        }
+        return (resPath, resStates);
+    }
+
+    public static (List<Coordinate>?, List<State>) FindPath(Graph<Coordinate> graph, State initialState, Coordinate goal)
     {
         var states = new List<State>();
-        var state = new State(start, 1);
+        var state = initialState;
         var q = new Queue<Vertex<Coordinate>>();
-        var v = graph.Vertices.Where(e => e.Equals(start)).FirstOrDefault(graph.Vertices[0]);
-        var track = new Queue<Queue<Coordinate>>();
-        var t = new Queue<Coordinate>();
-        var path = new Queue<Coordinate>();
+        var v = graph.Vertices.Where(e => e.Info.Equals(initialState.CurrentLocation)).FirstOrDefault(graph.Vertices[0]);
+        var track = new Queue<List<Coordinate>>();
+        var t = new List<Coordinate>();
+        var path = new List<Coordinate>();
         q.Enqueue(v);
-        t.Enqueue(v.Info);
-        track.Enqueue(new Queue<Coordinate>(t));
-        state.AddVisitedLocation(start);
-        states.Add(new State(state));
+        t.Add(v.Info);
+        track.Enqueue(new List<Coordinate>(t));
+        bool backtrack = false;
         while (q.Count > 0)
         {
             v = q.Dequeue();
             t = track.Dequeue();
+            state.CurrentLocation = v.Info;
+            states.Add(new State(state));
             if (v.Info.Equals(goal))
             {
                 path = t;
                 break;
             }
-            if (v.Right is not null && !state.VisitedLocations.Contains(v.Right.Info))
+            bool blocked = true;
+            if (v.Right is not null && !state.VisitedLocations.Contains(v.Right.Info) && !state.BacktrackLocations.Contains(v.Right.Info))
             {
-                var curTrack = new Queue<Coordinate>(t);
+                var curTrack = new List<Coordinate>(t);
                 q.Enqueue(v.Right);
-                curTrack.Enqueue(v.Right.Info);
+                curTrack.Add(v.Right.Info);
                 track.Enqueue(curTrack);
-                state.AddVisitedLocation(v.Right.Info);
-                state.CurrentLocation = v.Right.Info;
-                state.Step++;
-                states.Add(new State(state));
+                blocked = false;
             }
-            if (v.Down is not null && !state.VisitedLocations.Contains(v.Down.Info))
+            if (v.Down is not null && !state.VisitedLocations.Contains(v.Down.Info) && !state.BacktrackLocations.Contains(v.Down.Info))
             {
-                var curTrack = new Queue<Coordinate>(t);
+                var curTrack = new List<Coordinate>(t);
                 q.Enqueue(v.Down);
-                curTrack.Enqueue(v.Down.Info);
+                curTrack.Add(v.Down.Info);
                 track.Enqueue(curTrack);
-                state.AddVisitedLocation(v.Down.Info);
-                state.CurrentLocation = v.Down.Info;
-                state.Step++;
-                states.Add(new State(state));
+                blocked = false;
             }
-            if (v.Left is not null && !state.VisitedLocations.Contains(v.Left.Info))
+            if (v.Left is not null && !state.VisitedLocations.Contains(v.Left.Info) && !state.BacktrackLocations.Contains(v.Left.Info))
             {
-                var curTrack = new Queue<Coordinate>(t);
+                var curTrack = new List<Coordinate>(t);
                 q.Enqueue(v.Left);
-                curTrack.Enqueue(v.Left.Info);
+                curTrack.Add(v.Left.Info);
                 track.Enqueue(curTrack);
-                state.AddVisitedLocation(v.Left.Info);
-                state.CurrentLocation = v.Left.Info;
-                state.Step++;
-                states.Add(new State(state));
+                blocked = false;
             }
-            if (v.Up is not null && !state.VisitedLocations.Contains(v.Up.Info))
+            if (v.Up is not null && !state.VisitedLocations.Contains(v.Up.Info) && !state.BacktrackLocations.Contains(v.Up.Info))
             {
-                var curTrack = new Queue<Coordinate>(t);
+                var curTrack = new List<Coordinate>(t);
                 q.Enqueue(v.Up);
-                curTrack.Enqueue(v.Up.Info);
+                curTrack.Add(v.Up.Info);
                 track.Enqueue(curTrack);
-                state.AddVisitedLocation(v.Up.Info);
-                state.CurrentLocation = v.Up.Info;
-                state.Step++;
-                states.Add(new State(state));
+                blocked = false;
+            }
+            if (blocked && q.Count == 0)
+            {
+                state.RemoveLatestVisitedLocation();
+                q.Enqueue(v);
+                track.Enqueue(t);
+                states.RemoveAt(states.Count - 1);
+                backtrack = true;
+            }
+            else if (backtrack)
+            {
+                state.AddBacktrackLocation(v.Info);
+                backtrack = false;
+            }
+            else
+            {
+                state.AddVisitedLocation(v.Info);
             }
         }
-        if (path.Count == 0)
-        {
-            return (null, states);
-        }
-        else
-        {
-            return (path, states);
-        }
+        return (path.Count > 0 ? path : null, states);
     }
 }
