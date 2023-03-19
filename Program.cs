@@ -30,7 +30,7 @@ class Program
             {1, 1, 1, 1, 0, 1},
             {0, 1, 0, 1, 1, 1},
             {0, 1, 1, 1, 1, 0},
-            {0, 1, 0, 0, 1, 1},
+            {0, 1, 0, 1, 1, 1},
 // {1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 // {1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0},
 // {0,1,1,0,1,1,0,0,0,0,1,1,0,1,1,0,0,0,0,1,1,0,1,1,0,0,0,0,1,1,0},
@@ -76,8 +76,10 @@ class Program
                 }
             }
         }
-        var (path, states) = BFSSolver.FindPath(g, new State(new Coordinate(0, 0)), new Coordinate[] { new Coordinate(3, 1), new Coordinate(2, 4), new Coordinate(0, 5), new Coordinate(3, 5) });
-        path?.ToList().ForEach(e => Console.WriteLine(e));
+        var (path, states) = BFSSolver.FindPath(g, new State(new Coordinate(0, 0)), new Coordinate[] { new Coordinate(3, 1), new Coordinate(2, 4), new Coordinate(0, 5), new Coordinate(3, 5) }, false);
+        path?.ForEach(e => Console.WriteLine(e));
+        Console.WriteLine("Nodes: " + states.Count);
+        Console.WriteLine("Step: " + path?.Count);
         // List<StateDTO> data = new List<StateDTO>();
         // foreach (State s in states)
         // {
