@@ -49,20 +49,22 @@ public class BFSSolver
         }
     }
 
-    public static (List<Coordinate>?, List<State>) FindPath(Graph<Coordinate> graph, State initialState, Coordinate[] goals)
+    public static (List<Coordinate>?, List<State>) FindPath(Graph<Coordinate> graph, State initialState, Coordinate[] goals, bool tsp = false)
     {
+        Coordinate start = initialState.CurrentLocation;
+        var state = new State(initialState);
         var paths = new List<List<Coordinate>>();
         var statesList = new List<List<State>>();
         var goalSet = new List<Coordinate>(goals);
         while (goalSet.Count > 0)
         {
             var shortestGoal = goalSet[0];
-            var (shortestPath, shortestStates) = FindPath(graph, new State(initialState), shortestGoal);
+            var (shortestPath, shortestStates) = FindPath(graph, new State(state), shortestGoal);
             for (int i = 1; i < goalSet.Count; i++)
             {
                 var goal = goalSet[i];
-                var (path, states) = FindPath(graph, new State(initialState), goal);
-                if (path?.Count < shortestPath?.Count)
+                var (path, states) = FindPath(graph, new State(state), goal);
+                if (states.Count < shortestStates.Count)
                 {
                     shortestPath = path;
                     shortestStates = states;
@@ -71,16 +73,19 @@ public class BFSSolver
             }
             if (shortestPath is not null) paths.Add(shortestPath);
             statesList.Add(shortestStates);
-            initialState = new State(shortestStates.Last());
+            state = new State(shortestStates.Last());
             goalSet.Remove(shortestGoal);
         }
-        var resPath = new List<Coordinate>(paths[0]);
-        var resStates = new List<State>(statesList[0]);
-        for (int i = 1; i < goals.Length; i++)
+        if (tsp)
         {
-            resPath.AddRange(paths[i].Skip(1));
-            resStates.AddRange(statesList[i].Skip(1));
+            var (path, states) = FindPath(graph, new State(state), start);
+            if (path is not null) paths.Add(path);
+            statesList.Add(states);
         }
+        var resPath = new List<Coordinate>();
+        var resStates = new List<State>();
+        foreach (var p in paths) resPath.AddRange(p.Skip(1));
+        for (int i = 1; i < statesList.Count; i++) resStates.AddRange(statesList[i].Skip(1));
         return (resPath, resStates);
     }
 
@@ -96,15 +101,17 @@ public class BFSSolver
         q.Enqueue(v);
         t.Add(v.Info);
         track.Enqueue(new List<Coordinate>(t));
+        // backtrack
         bool backtrack = false;
+        var savedVisitedLocs = new List<Coordinate>();
         while (q.Count > 0)
         {
             v = q.Dequeue();
             t = track.Dequeue();
             state.CurrentLocation = v.Info;
-            states.Add(new State(state));
             if (v.Info.Equals(goal))
             {
+                states.Add(new State(state));
                 path = t;
                 break;
             }
@@ -143,19 +150,22 @@ public class BFSSolver
             }
             if (blocked && q.Count == 0)
             {
-                state.RemoveLatestVisitedLocation();
+                savedVisitedLocs.Add(state.VisitedLocations.First());
+                state.RemoveEarliestVisitedLocation();
                 q.Enqueue(v);
                 track.Enqueue(t);
-                states.RemoveAt(states.Count - 1);
                 backtrack = true;
             }
             else if (backtrack)
             {
+                foreach (var c in savedVisitedLocs) state.SavedVisitedLocations.Add(c);
+                states.Add(new State(state));
                 state.AddBacktrackLocation(v.Info);
                 backtrack = false;
             }
             else
             {
+                states.Add(new State(state));
                 state.AddVisitedLocation(v.Info);
             }
         }

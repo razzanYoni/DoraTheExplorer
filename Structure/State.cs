@@ -5,40 +5,45 @@ namespace DoraTheExplorer.Structure;
 
 public struct State
 {
-    private List<Coordinate> visitedLocations;
-    private List<Coordinate> backtrackLocations;
+    public List<Coordinate> VisitedLocations;
+    public List<Coordinate> BacktrackLocations;
     public Coordinate CurrentLocation;
-
-    public Coordinate[] VisitedLocations => visitedLocations.ToArray();
-    public Coordinate[] BacktrackLocations => backtrackLocations.ToArray();
+    public List<Coordinate> SavedVisitedLocations;
 
     public State(Coordinate currentLocation)
     {
         this.CurrentLocation = currentLocation;
-        backtrackLocations = new List<Coordinate>();
-        visitedLocations = new List<Coordinate>();
+        BacktrackLocations = new List<Coordinate>();
+        VisitedLocations = new List<Coordinate>();
+        SavedVisitedLocations = new List<Coordinate>();
     }
 
     public State(State other)
     {
         this.CurrentLocation = other.CurrentLocation;
-        this.visitedLocations = new List<Coordinate>(other.visitedLocations);
-        this.backtrackLocations = new List<Coordinate>(other.backtrackLocations);
+        this.VisitedLocations = new List<Coordinate>(other.VisitedLocations);
+        this.BacktrackLocations = new List<Coordinate>(other.BacktrackLocations);
+        this.SavedVisitedLocations = new List<Coordinate>(other.SavedVisitedLocations);
     }
 
     public void AddVisitedLocation(Coordinate coordinate)
     {
-        visitedLocations.Add(coordinate);
+        VisitedLocations.Add(coordinate);
     }
 
     public void AddBacktrackLocation(Coordinate coordinate)
     {
-        backtrackLocations.Add(coordinate);
+        BacktrackLocations.Add(coordinate);
     }
 
     public void RemoveLatestVisitedLocation()
     {
-        visitedLocations.RemoveAt(visitedLocations.Count - 1);
+        VisitedLocations.RemoveAt(VisitedLocations.Count - 1);
+    }
+
+    public void RemoveEarliestVisitedLocation()
+    {
+        VisitedLocations.RemoveAt(0);
     }
 
 }
