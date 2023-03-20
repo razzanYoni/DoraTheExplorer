@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Mime;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
@@ -88,7 +90,8 @@ public partial class MainWindow : Window
         this.nodesLabel.Content = "Nodes : ";
 
         this.routeTextBox = this.FindControl<TextBox>("RouteTextBox");
-        this.routeTextBox.SetValue(TextBox.TextProperty, "Route : fdashooaspdfpoasjodfhaoipfhdoashfopsadhfoiashdoifpahodhasofphpoahfopaosdfhdsaohfpo");
+        this.routeTextBox.SetValue(TextBox.TextProperty,
+            "Route : fdashooaspdfpoasjodfhaoipfhdoashfopsadhfoiashdoifpahodhasofphpoahfopaosdfhdsaohfpo");
 
         this.isNotError = false;
     }
@@ -181,11 +184,9 @@ public partial class MainWindow : Window
                 else if (!c.Coord.Equals(startCoord))
                 {
                     cell.SetValue(Grid.BackgroundProperty,
-                    c.Visitable ? Brushes.Azure : Brushes.Black);
+                        c.Visitable ? Brushes.Azure : Brushes.Black);
                     mazeGrid.Children.Add(cell);
-
                 }
-
             }
             /*
             (path, states) = BFSSolver.FindPath(graph, startState, new Coordinate[] {startState.CurrentLocation});
@@ -272,12 +273,30 @@ public partial class MainWindow : Window
         }
     }
 
-    public enum CellType
+    private void MazeSlider_OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
-        Start = -2,
-        Space = 0,
-        Wall = -1,
-        Treasure = -999,
-        undefined = -9999,
+        mazeSlider = (Slider)sender;
+        if (mazeSlider is not null && e.Property.Name == "Value" && states?.Count != 0 &&
+            solutionMatrix.States.Length != 0)
+        {
+            int idx = (int)mazeSlider.Value;
+            State state = solutionMatrix.States[idx];
+            Grid? cell;
+            foreach (var visited in state.VisitedLocations.Concat(state.SavedVisitedLocations))
+            {
+                cell = new Grid();
+                cell.SetValue(Grid.RowProperty, visited.y);
+                cell.SetValue(Grid.ColumnProperty, visited.x);
+                cell.SetValue(Panel.BackgroundProperty, Brushes.Yellow);
+                mazeGrid.Children.Add(cell);
+            }
+
+            var current = state.CurrentLocation;
+            cell = new Grid();
+            cell.SetValue(Grid.RowProperty, current.y);
+            cell.SetValue(Grid.ColumnProperty, current.x);
+            cell.SetValue(Panel.BackgroundProperty, Brushes.Blue);
+            mazeGrid.Children.Add(cell);
+        }
     }
 }
