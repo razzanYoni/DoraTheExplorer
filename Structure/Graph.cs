@@ -6,7 +6,7 @@ namespace DoraTheExplorer.Structure;
 public class Graph<T>
     where T : notnull
 {
-    private LinkedList<Vertex<T>> vertices;
+    public LinkedList<Vertex<T>> vertices;
     public Vertex<T>[] Vertices
     {
         get => vertices.ToArray();

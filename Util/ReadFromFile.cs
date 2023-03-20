@@ -1,8 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.IO;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using Avalonia.Controls;
+using Avalonia.Media;
+using Avalonia.Styling;
 using DoraTheExplorer.Models;
 using DoraTheExplorer.Structure;
 using DynamicData;
@@ -10,7 +15,7 @@ using DynamicData;
 namespace DoraTheExplorer.Util;
 
 public class ReadFromFile {
-    public (List<List<Vertex<Coordinate>>>?, Graph<Coordinate>?, State, List<Coordinate>?, bool) ReadFile(string path)
+    public static (List<List<int>>?, List<List<Vertex<Coordinate>>>?, Graph<Coordinate>?, State, List<Coordinate>?, bool) ReadFile(string path)
     {
         int nK = 0;
         int nT = 0;
@@ -29,17 +34,18 @@ public class ReadFromFile {
         State startState = new State(new Coordinate(-1,-1));
         List<Coordinate>? goals = new List<Coordinate>();
 
-        int[,] matrix = new int[row, col]; 
+        int[,] matrix = new int[row, col];
 
         for (int i = 0; i < lines.Length; i++) {
             for (int j = 0; j < lines[i].Length; j++)
             {
+
                 if (lines[i][j] == 'K') {
-                    // -3 : titik mulai
-                    matrix[i, j] = 0;
+                    // -2 : titik mulai
+                    matrix[i, j] = -2;
                     startState = new State(new Coordinate(i, j));
                     nK++;
-                    
+
                     verticesArr[i, j] = new Vertex<Coordinate>(new Coordinate(i, j));
                     if (j - 1 >= 0 && matrix[i, j - 1] == 0)
                     {   
@@ -54,12 +60,12 @@ public class ReadFromFile {
                     if (nK > 1)
                     {
                         // Send Alert
-                        return (null, null, startState, null, false);
+                        return (null, null, null, startState, null, false);
                     }
                 } else if (lines[i][j] == 'R') {
                     // 0 : Accessible
                     matrix[i, j] = 0;
-                    
+
                     verticesArr[i, j] = new Vertex<Coordinate>(new Coordinate(i, j));
                     if (j - 1 >= 0 && matrix[i, j - 1] == 0)
                     {   
@@ -74,8 +80,8 @@ public class ReadFromFile {
                 else if (lines[i][j] == 'T') {
                     // -999 : Treasure
                     // matrix[i, j] = -999;
-                    matrix[i, j] = 0;
-                    
+                    matrix[i, j] = -999;
+
                     verticesArr[i, j] = new Vertex<Coordinate>(new Coordinate(i, j));
                     if (j - 1 >= 0 && matrix[i, j - 1] == 0)
                     {   
@@ -92,23 +98,29 @@ public class ReadFromFile {
                 } else if (lines[i][j] == 'X') {
                     // -1 : Wall
                     matrix[i, j] = -1;
+                    
                 } else {
                     // Invalid input
                     // Send Alert
-                    return (null, null, startState, null, false);
+                    return (null, null, null, startState, null, false);
                 }
             }
         }
+
+        List<List<int>> listMatrix = new List<List<int>>();
         for (int i = 0; i < row; i++)
         {
             List<Vertex<Coordinate>> temp = new List<Vertex<Coordinate>>();
+            List<int> tempList = new List<int>();
             for (int j = 0; j < col; j++)
             {
                 temp.Add(verticesArr[i, j]);
+                tempList.Add(matrix[i,j]);
             }
             vertices.Add(temp);
+            listMatrix.Add(tempList);
         }
-
-        return (vertices, graph, startState, goals, true);
+        
+        return (listMatrix, vertices, graph, startState, goals, true);
     }
 }

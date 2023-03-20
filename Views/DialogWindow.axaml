@@ -1,0 +1,31 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="1024"
+        Width="300" Height="150"
+        x:Class="Tubes2_DoraTheExplorer.Views.DialogWindow"
+        Title="Notification"
+        WindowStartupLocation="CenterOwner">
+        <Grid
+                RowDefinitions="*,Auto,*"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center">
+                <TextBlock 
+                        Grid.Row="0"
+                        x:Name="MessageTextBlock"
+                        Margin="10" 
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"/>
+                <Button 
+                        Grid.Row="2"
+                        Content="OK" 
+                        Margin="10" 
+                        x:Name="AlertButton" 
+                        HorizontalAlignment="Center"
+                        HorizontalContentAlignment="Center"
+                        VerticalAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        BorderThickness="0.5"/>
+        </Grid>
+</Window>

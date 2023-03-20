@@ -8,7 +8,10 @@
 		Width="1000" Height="711"
         x:Class="DoraTheExplorer.Views.MainWindow"
 		x:DataType="vm:MainWindowViewModel"
-        Title="Dora The Explorer">
+        Title="Dora The Explorer"
+        
+        WindowStartupLocation="CenterScreen">
+        <!-- ExtendClientAreaToDecorationsHint="True"> -->
 	
 	<!-- Icon="..\..\..\Assets\mandalorianlogo.ico" Logo tapi error-->
 	<!-- TODO : Atur Font Size biar relative, Binding Matrix dan Slider, Color Palette-->
@@ -98,13 +101,6 @@
 			<Grid 
 				Grid.Column="0" 
 				RowDefinitions="12*,*">
-				
-				<!-- Maze 
-				<Grid 
-					Grid.Row="0" 
-					Background="Black" 
-					Name="MazeVisualization">
-				</Grid> -->
 
 				<Grid 
 					Grid.Row="0"
@@ -196,7 +192,8 @@
 						HorizontalAlignment="Center"
 						Classes="inputButton"
 						Content="Browse File"
-						x:Name="BrowseFileButton">
+						x:Name="BrowseFileButton"
+						Click="BrowseFileButton_Click">
 					</Button>
 
 					<!-- Visualize Button -->
@@ -206,6 +203,7 @@
 						HorizontalAlignment="Center"
 						Classes="inputButton"
 						x:Name="VisualizeButton"
+						Click="VisualizeButton_Click"
 						Content="Visualize">
 					</Button>
 				</Grid>
@@ -268,7 +266,7 @@
 				Foreground="White" 
 				Background="Black"
 				Content="Search"
-			>
+				Click="SearchButton_Click">
 				
 				<!-- Command="{Binding SearchResult}"
 				    Command="{Binding Grid, ElementName=mazeVisulaization}"-->
