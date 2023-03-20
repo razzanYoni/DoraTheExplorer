@@ -1,25 +1,15 @@
-using System;
-using System.Threading.Tasks;
-using System.Threading; 
-using System.IO;
-using System.Text.Json;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Avalonia;
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
-using Avalonia.Logging;
 using Avalonia.Media;
-using ReactiveUI;
 using DoraTheExplorer.ViewModels;
 using DoraTheExplorer.Algorithm;
-using DoraTheExplorer.DTO;
-using DoraTheExplorer.Models;
 using DoraTheExplorer.Structure;
 using DoraTheExplorer.Util;
-using DynamicData;
 using Tubes2_DoraTheExplorer.Views;
 
 namespace DoraTheExplorer.Views;
@@ -33,7 +23,7 @@ namespace DoraTheExplorer.Views;
 public partial class MainWindow : Window
 {
     public MainWindowViewModel viewModel;
-    
+
     public RadioButton bfsRadioButton;
     public RadioButton dfsRadioButton;
     public CheckBox tspCheckBox;
@@ -52,14 +42,12 @@ public partial class MainWindow : Window
 
     public string filePath;
 
-    private List<List<int>>? listMatrix;
-    private List<List<Vertex<Coordinate>>> vertices;
     private Graph<Coordinate>? graph;
     private List<Coordinate>? path;
     private List<State>? states;
-    private State startState;
-    private List<Coordinate>? goals;
     private bool isNotError;
+    private SolutionMatrix solutionMatrix;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -88,7 +76,6 @@ public partial class MainWindow : Window
         this.mazeSlider.Orientation = Orientation.Horizontal;
         this.mazeSlider.TickPlacement = TickPlacement.TopLeft;
         this.mazeSlider.TickFrequency = 1;
-        System.Diagnostics.Debug.WriteLine(this.mazeSlider.Value);
 
         this.executionTimeLabel = this.FindControl<Label>("ExecutionTimeLabel");
         this.executionTimeLabel.Content = "Execution Time : 00 ms";
@@ -98,11 +85,11 @@ public partial class MainWindow : Window
 
         this.nodesLabel = this.FindControl<Label>("NodesLabel");
         this.nodesLabel.Content = "Nodes : ";
-        
+
         this.routeLabel = this.FindControl<Label>("RouteLabel");
         // dummy
         this.routeLabel.Content = "Route : L-U-R-U-R-R\n" +
-                                           "U-R-D-D-D-D-D\n";
+                                  "U-R-D-D-D-D-D\n";
 
         this.isNotError = false;
     }
@@ -110,7 +97,7 @@ public partial class MainWindow : Window
     public void BrowseFileButton_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new OpenFileDialog();
-        dialog.Filters.Add(new FileDialogFilter() { Name = "Text Files", Extensions = { "txt" } });
+        dialog.Filters?.Add(new FileDialogFilter() { Name = "Text Files", Extensions = { "txt" } });
         dialog.AllowMultiple = false;
         var result = dialog.ShowAsync(this);
         if (result.Result != null)
@@ -119,60 +106,47 @@ public partial class MainWindow : Window
             System.Diagnostics.Debug.WriteLine(result.Result[0]);
 
             // Show File Name in Window
-            this.fileNameLabel.Content = "Filename : " + result.Result[0].Substring(result.Result[0].LastIndexOf('\\')+1);
+            this.fileNameLabel.Content =
+                "Filename : " + result.Result[0].Substring(result.Result[0].LastIndexOf('\\') + 1);
 
             this.filePath = result.Result[0];
-            
+
             /* Read File */
             // var readFromFile = new ReadFromFile();
-            if (vertices is not null)
-            {
-                vertices.Clear();
-            }
-
-            if (goals is not null)
-            {
-                goals.Clear();
-            }
-
-            if (listMatrix is not null)
-            {
-                listMatrix.Clear();
-            }
-
             if (graph is not null)
             {
                 graph.vertices.Clear();
             }
-            
-            (listMatrix, vertices, graph, startState, goals, isNotError) = ReadFromFile.ReadFile(result.Result[0]);
+
+            (solutionMatrix, graph, isNotError) = ReadFromFile.ReadFile(result.Result[0]);
             if (!isNotError)
             {
                 // file error alert in window
-                System.Diagnostics.Debug.WriteLine("File Error");
+                Debug.WriteLine("File Error");
                 var alert = new DialogWindow("File Error");
-                
+
                 alert.ShowDialog(this);
                 this.fileNameLabel.Content = "No File Selected";
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("Udah Bener");
+                Debug.WriteLine("Udah Bener");
             }
-        } else
+        }
+        else
         {
-            System.Diagnostics.Debug.WriteLine("Masukkan File Dengan Benar");
+            Debug.WriteLine("Masukkan File Dengan Benar");
         }
     }
 
-    public void VisualizeButton_Click(object sender, RoutedEventArgs e )
+    public void VisualizeButton_Click(object sender, RoutedEventArgs e)
     {
         /* Visualisasi Maze */
-        if ((isNotError) && (filePath is not null))
+        if (isNotError)
         {
-            int row = listMatrix.Count;
-            int col = listMatrix[0].Count;
-            
+            int row = solutionMatrix.Height;
+            int col = solutionMatrix.Width;
+
             mazeGrid.RowDefinitions.Clear();
             mazeGrid.ColumnDefinitions.Clear();
 
@@ -185,32 +159,33 @@ public partial class MainWindow : Window
             {
                 mazeGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
             }
-            
-            for (int i = 0; i < row; i++)
+
+            // start cell
+            var startCoord = solutionMatrix.States[0].CurrentLocation;
+            var cell = new Grid();
+            cell.SetValue(Grid.RowProperty, startCoord.y);
+            cell.SetValue(Grid.ColumnProperty, startCoord.x);
+            cell.SetValue(Grid.BackgroundProperty, Avalonia.Media.Brushes.Aquamarine);
+            mazeGrid.Children.Add(cell);
+
+            foreach (var c in solutionMatrix.Cells)
             {
-                for (int j = 0; j < col; j++)
+                cell = new Grid();
+                var coord = c.Coord;
+                cell.SetValue(Grid.RowProperty, coord.y);
+                cell.SetValue(Grid.ColumnProperty, coord.x);
+                if (solutionMatrix.TreasureLocations.ToList().Any(coordinate => coordinate.Equals(coord)))
                 {
-                    var cell = new Grid();
-                    cell.SetValue(Grid.RowProperty, i);
-                    cell.SetValue(Grid.ColumnProperty, j);
-                    if (listMatrix[i][j] == -2)
-                    {
-                        cell.SetValue(Grid.BackgroundProperty, Avalonia.Media.Brushes.Aquamarine);
-                    } else if (listMatrix[i][j] == 0)
-                    {
-                        cell.SetValue(Grid.BackgroundProperty, Avalonia.Media.Brushes.Azure);
-                    } else if (listMatrix[i][j] == -999)
-                    {
-                        cell.SetValue(Grid.BackgroundProperty, Avalonia.Media.Brushes.Gold);
-                    }
-                    else
-                    {
-                        cell.SetValue(Grid.BackgroundProperty, Avalonia.Media.Brushes.Black);
-                    }
-                    mazeGrid.Children.Add(cell);
+                    cell.SetValue(Grid.BackgroundProperty, Brushes.Gold);
                 }
+                else
+                {
+                    cell.SetValue(Grid.BackgroundProperty,
+                        c.Visitable ? Brushes.Azure : Brushes.Black);
+                }
+
+                mazeGrid.Children.Add(cell);
             }
-            
             /*
             (path, states) = BFSSolver.FindPath(graph, startState, new Coordinate[] {startState.CurrentLocation});
             /* Do something #1#
@@ -221,22 +196,22 @@ public partial class MainWindow : Window
             }
 
             var jsonResult = JsonSerializer.Serialize(data);
-            
+
             path.Clear();
             states.Clear();*/
         }
         else
         {
             var alert = new DialogWindow("File Belum Ada");
-                
+
             alert.ShowDialog(this);
         }
     }
-    
+
     public void SearchButton_Click(object sender, RoutedEventArgs e)
     {
         /* Run Time */
-        if ((isNotError) && (this.filePath is not null) && (graph is not null) && (goals is not null))
+        if ((isNotError) && (graph is not null) && (solutionMatrix.TreasureLocations.Length != 0))
         {
             if (path is not null)
             {
@@ -247,19 +222,21 @@ public partial class MainWindow : Window
             {
                 states.Clear();
             }
-            
+
             if (this.tspCheckBox.IsChecked == true)
             {
                 if (this.bfsRadioButton.IsChecked == true)
                 {
                     System.Diagnostics.Debug.WriteLine("Eksekusi bfs dengan tsp \n");
-                    (path, states) = BFSSolver.FindPath(graph, startState, goals.ToArray(), true);
+                    (path, states) = BFSSolver.FindPath(graph, solutionMatrix.States[0],
+                        solutionMatrix.TreasureLocations, true);
                 }
                 else
                 {
                     System.Diagnostics.Debug.WriteLine("Eksekusi dfs dengan tsp \n");
 
-                    (path, states) = BFSSolver.FindPath(graph, startState, goals.ToArray(), true);
+                    (path, states) = DFSSolver.FindPath(graph, solutionMatrix.States[0],
+                        solutionMatrix.TreasureLocations, true);
                 }
             }
             else
@@ -267,19 +244,19 @@ public partial class MainWindow : Window
                 if (this.bfsRadioButton.IsChecked == true)
                 {
                     System.Diagnostics.Debug.WriteLine("Eksekusi bfs tanpa tsp \n");
-                    (path, states) = BFSSolver.FindPath(graph, startState, goals.ToArray(), false);
+                    (path, states) = BFSSolver.FindPath(graph, solutionMatrix.States[0],
+                        solutionMatrix.TreasureLocations, false);
 
                     this.mazeSlider.Maximum = states.Count;
-                    
                 }
                 else
                 {
                     System.Diagnostics.Debug.WriteLine("Eksekusi dfs tanpa tsp \n");
-                    
-                    (path, states) = BFSSolver.FindPath(graph, startState, goals.ToArray(), false);
+
+                    (path, states) = DFSSolver.FindPath(graph, solutionMatrix.States[0],
+                        solutionMatrix.TreasureLocations, false);
 
                     this.mazeSlider.Maximum = states.Count;
-                    
                 }
             }
         }
@@ -289,10 +266,9 @@ public partial class MainWindow : Window
             System.Diagnostics.Debug.WriteLine("Belum ada file\n");
             // show dialog alert
             var alert = new DialogWindow("Belum ada file");
-                
+
             alert.ShowDialog(this);
         }
-
     }
 
     public enum CellType
