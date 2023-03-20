@@ -37,4 +37,15 @@ public class SolutionMatrix
     {
         this._cells.Add(cell);
     }
+    
+    public void AddStates(List<State> states)
+    {
+        this._states.AddRange(states);
+    }
+    
+    public void SetStates(List<State> states)
+    {
+        this._states.Clear();
+        this._states.AddRange(states);
+    }
 }

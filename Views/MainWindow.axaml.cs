@@ -18,10 +18,9 @@ using Tubes2_DoraTheExplorer.Views;
 namespace DoraTheExplorer.Views;
 
 // TODO : Execution Time, Steps, Route
-// TODO : Visualisasi Maze
-// TODO : Slider
+// TODO : Slider SHow solution path 
 // TODO : Counter untuk alpha
-// TODO : JSON reader
+
 
 public partial class MainWindow : Window
 {
@@ -232,6 +231,8 @@ public partial class MainWindow : Window
                     Debug.WriteLine("Eksekusi bfs dengan tsp \n");
                     (path, states) = BFSSolver.FindPath(graph, solutionMatrix.States[0],
                         solutionMatrix.TreasureLocations, true);
+                    this.mazeSlider.Maximum = states.Count;
+                    this.solutionMatrix.SetStates(states);
                 }
                 else
                 {
@@ -239,6 +240,8 @@ public partial class MainWindow : Window
 
                     (path, states) = DFSSolver.FindPath(graph, solutionMatrix.States[0],
                         solutionMatrix.TreasureLocations, true);
+                    this.mazeSlider.Maximum = states.Count;
+                    this.solutionMatrix.SetStates(states);
                 }
             }
             else
@@ -250,6 +253,7 @@ public partial class MainWindow : Window
                         solutionMatrix.TreasureLocations, false);
 
                     this.mazeSlider.Maximum = states.Count;
+                    this.solutionMatrix.SetStates(states);
                 }
                 else
                 {
@@ -259,6 +263,7 @@ public partial class MainWindow : Window
                         solutionMatrix.TreasureLocations, false);
 
                     this.mazeSlider.Maximum = states.Count;
+                    this.solutionMatrix.SetStates(states);
                 }
             }
         }
@@ -276,7 +281,7 @@ public partial class MainWindow : Window
     private void MazeSlider_OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         mazeSlider = (Slider)sender;
-        if (mazeSlider is not null && e.Property.Name == "Value" && states?.Count != 0 &&
+        if (mazeSlider is not null && e.Property.Name == "Value" && states is not null &&
             solutionMatrix.States.Length != 0)
         {
             int idx = (int)mazeSlider.Value;
