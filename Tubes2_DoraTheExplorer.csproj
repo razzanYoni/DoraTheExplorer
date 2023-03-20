@@ -10,7 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Util" />
     <Folder Include="Algorithm" />
     <Folder Include="DTO" />
     <Folder Include="Models" />
