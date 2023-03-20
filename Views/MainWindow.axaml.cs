@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Mime;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -21,7 +21,6 @@ namespace DoraTheExplorer.Views;
 // TODO : Slider SHow solution path 
 // TODO : Counter untuk alpha
 
-
 public partial class MainWindow : Window
 {
     public MainWindowViewModel viewModel;
@@ -35,20 +34,23 @@ public partial class MainWindow : Window
     public Button visualizeButton;
     public Button searchButton;
 
-    public Grid mazeGrid;
-    public Slider mazeSlider;
+    private StackPanel mazePanel;
+    private StackPanel[] mazeRows;
+    private Rectangle[,] cells;
+    private ISolidColorBrush[,] cellColors;
+    public Slider? mazeSlider;
     public Label executionTimeLabel;
     public Label stepsLabel;
     public Label nodesLabel;
     public TextBox routeTextBox;
 
-    public string filePath;
+    public string FilePath;
 
-    private Graph<Coordinate>? graph;
-    private List<Coordinate>? path;
-    private List<State>? states;
-    private bool isNotError;
-    private SolutionMatrix solutionMatrix;
+    private Graph<Coordinate>? _graph;
+    private List<Coordinate>? _path;
+    private List<State>? _states;
+    private bool _isNotError;
+    private SolutionMatrix _solutionMatrix;
 
     public MainWindow()
     {
@@ -71,8 +73,7 @@ public partial class MainWindow : Window
 
         this.searchButton = this.FindControl<Button>("SearchButton");
 
-        this.mazeGrid = this.FindControl<Grid>("MazeGrid");
-        this.mazeGrid.Background = Brushes.Black;
+        this.mazePanel = this.FindControl<StackPanel>("MazePanel");
 
         this.mazeSlider = this.FindControl<Slider>("MazeSlider");
         this.mazeSlider.Orientation = Orientation.Horizontal;
@@ -92,7 +93,7 @@ public partial class MainWindow : Window
         this.routeTextBox.SetValue(TextBox.TextProperty,
             "Route : fdashooaspdfpoasjodfhaoipfhdoashfopsadhfoiashdoifpahodhasofphpoahfopaosdfhdsaohfpo");
 
-        this.isNotError = false;
+        this._isNotError = false;
     }
 
     public void BrowseFileButton_Click(object sender, RoutedEventArgs e)
@@ -104,23 +105,23 @@ public partial class MainWindow : Window
         if (result.Result != null)
         {
             // path file : result.Result[0]
-            System.Diagnostics.Debug.WriteLine(result.Result[0]);
+            Debug.WriteLine(result.Result[0]);
 
             // Show File Name in Window
             this.fileNameLabel.Content =
                 "Filename : " + result.Result[0].Substring(result.Result[0].LastIndexOf('\\') + 1);
 
-            this.filePath = result.Result[0];
+            this.FilePath = result.Result[0];
 
             /* Read File */
             // var readFromFile = new ReadFromFile();
-            if (graph is not null)
+            if (_graph is not null)
             {
-                graph.ClearVertices();
+                _graph.ClearVertices();
             }
 
-            (solutionMatrix, graph, isNotError) = Utils.ReadFile(result.Result[0]);
-            if (!isNotError)
+            (_solutionMatrix, _graph, _isNotError) = Utils.ReadFile(result.Result[0]);
+            if (!_isNotError)
             {
                 // file error alert in window
                 Debug.WriteLine("File Error");
@@ -142,106 +143,88 @@ public partial class MainWindow : Window
 
     public void VisualizeButton_Click(object sender, RoutedEventArgs e)
     {
+        (_solutionMatrix, _graph, _isNotError) =
+            Utils.ReadFile("/home/msfir/Documents/Tubes/Stima/Tubes2_DoraTheExplorer/Test/tc1.txt");
         /* Visualisasi Maze */
-        if (isNotError)
-        {
-            int row = solutionMatrix.Height;
-            int col = solutionMatrix.Width;
-
-            mazeGrid.RowDefinitions.Clear();
-            mazeGrid.ColumnDefinitions.Clear();
-
-            for (int i = 0; i < row; i++)
-            {
-                mazeGrid.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
-            }
-
-            for (int j = 0; j < col; j++)
-            {
-                mazeGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
-            }
-
-            // start cell
-            var startCoord = solutionMatrix.States[0].CurrentLocation;
-            var cell = new Grid();
-            cell.SetValue(Grid.RowProperty, startCoord.y);
-            cell.SetValue(Grid.ColumnProperty, startCoord.x);
-            cell.SetValue(Grid.BackgroundProperty, Brushes.Aquamarine);
-            mazeGrid.Children.Add(cell);
-
-            foreach (var c in solutionMatrix.Cells)
-            {
-                cell = new Grid();
-                var coord = c.Coord;
-                cell.SetValue(Grid.RowProperty, coord.y);
-                cell.SetValue(Grid.ColumnProperty, coord.x);
-                if (solutionMatrix.TreasureLocations.ToList().Any(coordinate => coordinate.Equals(coord)))
-                {
-                    cell.SetValue(Grid.BackgroundProperty, Brushes.Gold);
-                    mazeGrid.Children.Add(cell);
-                }
-                else if (!c.Coord.Equals(startCoord))
-                {
-                    cell.SetValue(Grid.BackgroundProperty,
-                        c.Visitable ? Brushes.Azure : Brushes.Black);
-                    mazeGrid.Children.Add(cell);
-                }
-            }
-            /*
-            (path, states) = BFSSolver.FindPath(graph, startState, new Coordinate[] {startState.CurrentLocation});
-            /* Do something #1#
-            List<StateDTO> data = new List<StateDTO>();
-            foreach (State s in states)
-            {
-                data.Add(StateDTO.From(s));
-            }
-
-            var jsonResult = JsonSerializer.Serialize(data);
-
-            path.Clear();
-            states.Clear();*/
-        }
-        else
+        if (!_isNotError)
         {
             var alert = new DialogWindow("File Belum Ada");
-
             alert.ShowDialog(this);
+            return;
+        }
+
+        var row = _solutionMatrix!.Height;
+        var col = _solutionMatrix.Width;
+        mazeRows = new StackPanel[row];
+        cells = new Rectangle[row, col];
+        cellColors = new ISolidColorBrush[row, col];
+        var size = Math.Min(500 / row, 800 / col);
+
+        mazePanel.Children.Clear();
+        for (var i = 0; i < row; i++)
+        {
+            mazeRows[i] = new StackPanel
+            {
+                Orientation = Orientation.Horizontal
+            };
+            for (var j = 0; j < col; j++)
+            {
+                cells[i, j] = new Rectangle
+                {
+                    Width = size,
+                    Height = size,
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 1
+                };
+                mazeRows[i].Children.Add(cells[i, j]);
+            }
+
+            mazePanel.Children.Add(mazeRows[i]);
+        }
+
+        // start cell
+        var startCoord = _solutionMatrix.States[0].CurrentLocation;
+        cells[startCoord.y, startCoord.x].Fill = Brushes.Aquamarine;
+        cellColors[startCoord.y, startCoord.x] = Brushes.Aquamarine;
+
+        foreach (var c in _solutionMatrix.Cells)
+        {
+            var coord = c.Coord;
+            if (_solutionMatrix.TreasureLocations.ToList().Any(coordinate => coordinate.Equals(coord)))
+            {
+                cellColors[coord.y, coord.x] = Brushes.Gold;
+                cells[coord.y, coord.x].Fill = cellColors[coord.y, coord.x];
+            }
+            else if (!c.Coord.Equals(startCoord))
+            {
+                cellColors[coord.y, coord.x] = c.Visitable ? Brushes.Azure : Brushes.Black;
+                cells[coord.y, coord.x].Fill = cellColors[coord.y, coord.x];
+            }
         }
     }
 
     public void SearchButton_Click(object sender, RoutedEventArgs e)
     {
         /* Run Time */
-        if ((isNotError) && (graph is not null) && (solutionMatrix.TreasureLocations.Length != 0))
+        if ((_isNotError) && (_graph is not null) && (_solutionMatrix.TreasureLocations.Length != 0))
         {
-            if (path is not null)
-            {
-                path.Clear();
-            }
-
-            if (states is not null)
-            {
-                states.Clear();
-            }
+            _path?.Clear();
+            _states?.Clear();
 
             if (this.tspCheckBox.IsChecked == true)
             {
                 if (this.bfsRadioButton.IsChecked == true)
                 {
                     Debug.WriteLine("Eksekusi bfs dengan tsp \n");
-                    (path, states) = BFSSolver.FindPath(graph, solutionMatrix.States[0],
-                        solutionMatrix.TreasureLocations, true);
-                    this.mazeSlider.Maximum = states.Count;
-                    this.solutionMatrix.SetStates(states);
+                    (_path, _states) = BFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
+                        _solutionMatrix.TreasureLocations, true);
                 }
                 else
                 {
                     Debug.WriteLine("Eksekusi dfs dengan tsp \n");
 
-                    (path, states) = DFSSolver.FindPath(graph, solutionMatrix.States[0],
-                        solutionMatrix.TreasureLocations, true);
-                    this.mazeSlider.Maximum = states.Count;
-                    this.solutionMatrix.SetStates(states);
+                    (_path, _states) = DFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
+                        _solutionMatrix.TreasureLocations, true);
                 }
             }
             else
@@ -249,28 +232,26 @@ public partial class MainWindow : Window
                 if (this.bfsRadioButton.IsChecked == true)
                 {
                     Debug.WriteLine("Eksekusi bfs tanpa tsp \n");
-                    (path, states) = BFSSolver.FindPath(graph, solutionMatrix.States[0],
-                        solutionMatrix.TreasureLocations, false);
-
-                    this.mazeSlider.Maximum = states.Count;
-                    this.solutionMatrix.SetStates(states);
+                    (_path, _states) = BFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
+                        _solutionMatrix.TreasureLocations);
                 }
                 else
                 {
                     Debug.WriteLine("Eksekusi dfs tanpa tsp \n");
 
-                    (path, states) = DFSSolver.FindPath(graph, solutionMatrix.States[0],
-                        solutionMatrix.TreasureLocations, false);
-
-                    this.mazeSlider.Maximum = states.Count;
-                    this.solutionMatrix.SetStates(states);
+                    (_path, _states) = DFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
+                        _solutionMatrix.TreasureLocations);
                 }
             }
+
+            this.mazeSlider!.Maximum = _states.Count;
+            this.mazeSlider.TickFrequency = 1;
+            this._solutionMatrix.SetStates(_states);
         }
         else
         {
             // send alert
-            System.Diagnostics.Debug.WriteLine("Belum ada file\n");
+            Debug.WriteLine("Belum ada file\n");
             // show dialog alert
             var alert = new DialogWindow("Belum ada file");
 
@@ -280,28 +261,46 @@ public partial class MainWindow : Window
 
     private void MazeSlider_OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
-        mazeSlider = (Slider)sender;
-        if (mazeSlider is not null && e.Property.Name == "Value" && states is not null &&
-            solutionMatrix.States.Length != 0)
+        mazeSlider = sender as Slider;
+        if (mazeSlider is null || e.Property.Name != "Value" || _states is null ||
+            _solutionMatrix.States.Length == 0) return;
+        var idx = (int)mazeSlider.Value;
+        if (idx >= _solutionMatrix.States.Length)
         {
-            int idx = (int)mazeSlider.Value;
-            State state = solutionMatrix.States[idx];
-            Grid? cell;
-            foreach (var visited in state.VisitedLocations.Concat(state.SavedVisitedLocations))
+            foreach (var p in _path!)
             {
-                cell = new Grid();
-                cell.SetValue(Grid.RowProperty, visited.y);
-                cell.SetValue(Grid.ColumnProperty, visited.x);
-                cell.SetValue(Panel.BackgroundProperty, Brushes.Yellow);
-                mazeGrid.Children.Add(cell);
+                cells[p.y, p.x].Fill = Brushes.LightGreen;
             }
 
-            var current = state.CurrentLocation;
-            cell = new Grid();
-            cell.SetValue(Grid.RowProperty, current.y);
-            cell.SetValue(Grid.ColumnProperty, current.x);
-            cell.SetValue(Panel.BackgroundProperty, Brushes.Blue);
-            mazeGrid.Children.Add(cell);
+            return;
+        }
+
+        var state = _solutionMatrix.States[idx];
+        var row = _solutionMatrix.Height;
+        var col = _solutionMatrix.Width;
+        for (var i = 0; i < row; i++)
+        {
+            for (var j = 0; j < col; j++)
+            {
+                var loc = new Coordinate(j, i);
+                if (state.CurrentLocation.Equals(loc))
+                {
+                    cells[i, j].Fill = Brushes.Blue;
+                }
+                else if (state.BacktrackLocations.ToList().Any(coordinate => coordinate.Equals(loc)))
+                {
+                    cells[i, j].Fill = Brushes.Red;
+                }
+                else if (state.VisitedLocations.ToList().Concat(state.SavedVisitedLocations)
+                         .Any(coordinate => coordinate.Equals(loc)))
+                {
+                    cells[i, j].Fill = Brushes.Yellow;
+                }
+                else
+                {
+                    cells[i, j].Fill = cellColors[i, j];
+                }
+            }
         }
     }
 }

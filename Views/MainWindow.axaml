@@ -1,279 +1,281 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-		xmlns:vm="using:DoraTheExplorer.ViewModels"
+        xmlns:vm="using:DoraTheExplorer.ViewModels"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:maze="clr-namespace:DoraTheExplorer.Models;assembly=Tubes2_DoraTheExplorer"
+        xmlns:maze="clr-namespace:DoraTheExplorer.Models;assembly=Tubes3_DoraTheExplorer"
         mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="1024"
-		Width="1000" Height="711"
         x:Class="DoraTheExplorer.Views.MainWindow"
-		x:DataType="vm:MainWindowViewModel"
+        x:DataType="vm:MainWindowViewModel"
         Title="Dora The Explorer"
-        
+        Width="1024"
+        Height="720"
+
         CanResize="False"
         WindowStartupLocation="CenterScreen">
-        <!-- ExtendClientAreaToDecorationsHint="True"> -->
-	
-	<!-- Icon="..\..\..\Assets\mandalorianlogo.ico" Logo tapi error-->
-	<!-- TODO : Atur Font Size biar relative, Binding Matrix dan Slider, Color Palette-->
-	
-	<Design.DataContext>
-		<vm:MainWindowViewModel/>
-	</Design.DataContext>
-	
-	<Window.Resources>
-		<ResourceDictionary>
-			<!--We set the XAML resource-->
-			<SolidColorBrush x:Key="StatusCell" 
-			                 Color="Green"/>
-		</ResourceDictionary>
-	</Window.Resources>
-	
-	<Window.Styles>
-		<!-- Input File Button (Hover) -->
-		<Style Selector="Button.inputButton:pointerover /template/ ContentPresenter">
-			<Setter
-				Property="Background"
-				Value="Red">
-			</Setter>
-			<Setter
-				Property="RenderTransform"
-				Value="scale(1.05)">
-			</Setter>
-			<Setter
-				Property="CornerRadius"
-				Value="5">
-			</Setter>
-			<Setter
-				Property="TextBox.Foreground"
-				Value="Yellow">
-			</Setter>
-		</Style>
-	</Window.Styles>
-	
-	<!-- Parent -->
-	<Grid 
-		ColumnDefinitions="*" 
-		RowDefinitions="2*,15*,3*">
-		
-		<!-- Title Bar -->
-		<Grid 
-			Grid.Row="0" 
-			Background="Red" 
-			RowDefinitions="3*,2*" 
-			VerticalAlignment="Stretch">
-			
-			<!-- Title -->
-			<Grid 
-				Grid.Row="0" 
-				VerticalAlignment="Center" 
-				HorizontalAlignment="Center">
-				
-				<Label HorizontalContentAlignment="Center"
-				       FontWeight="Bold" 
-				       FontFamily="Comic Sans MS"
-				       Content="TREASURE HUNTER">
-				</Label>
-			</Grid>
-			
-			<!-- Group Name -->
-			<Grid 
-				Grid.Row="1" 
-				VerticalAlignment="Top" 
-				HorizontalAlignment="Center">
-				
-				<Label 
-					FontFamily="Comic Sans MS" 
-					HorizontalContentAlignment="Center"
-					VerticalContentAlignment="Top"
-					Content="BY DORA THE EXPLORER">
-				</Label>
-			</Grid>
-		</Grid>
+    <!-- ExtendClientAreaToDecorationsHint="True"> -->
 
-		<!-- Result -->
-		<Grid 
-			Grid.Row="1" 
-			Background="Blue" 
-			RowDefinitions="*" 
-			ColumnDefinitions="10*,4*">
-			
-			<!-- Maze Visualization -->
-			<Grid 
-				Grid.Column="0" 
-				RowDefinitions="12*,*">
+    <!-- Icon="..\..\..\Assets\mandalorianlogo.ico" Logo tapi error-->
+    <!-- TODO : Atur Font Size biar relative, Binding Matrix dan Slider, Color Palette-->
 
-				<Grid 
-					Grid.Row="0"
-					x:Name="MazeGrid"
-					/>
-				
-				<!-- Slider -->
-				<Grid 
-					Grid.Row="1">
-					<Slider
-						x:Name="MazeSlider"
-						PropertyChanged="MazeSlider_OnPropertyChanged">
-					</Slider>
-				</Grid>
-			</Grid>
-			
-			<!-- Output -->
-			<Grid 
-				Grid.Column="1" 
-				Background="Yellow" 
-				RowDefinitions="*,*,*,10*">
-					
-				<!-- Execution Time (Statis) -->
-				<Label 
-					Grid.Row="0" 
-					FontFamily="Comic Sans MS" 
-					HorizontalAlignment="Left" 
-					Margin="5"
-					x:Name="ExecutionTimeLabel"> 
-				</Label>
-				
-				<!-- Steps (Statis) -->
-				<Label 
-					Grid.Row="1" 
-					FontFamily="Comic Sans MS" 
-					HorizontalAlignment="Left" 
-					Margin="5"
-					x:Name="StepsLabel">
-				</Label>
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
 
-				<!-- Nodes (Statis) -->
-				<Label 
-					Grid.Row="2" 
-					FontFamily="Comic Sans MS" 
-					HorizontalAlignment="Left" 
-					Margin="5"
-					x:Name="NodesLabel">
-				</Label>
-				
-				<!-- Route (FlexBox) -->
-				<TextBox
-					Grid.Row="3" 
-					FontFamily="Comic Sans MS" 
-					HorizontalAlignment="Left" 
-					Margin="5"
-					TextWrapping="Wrap"
-					MinWidth="210"
-					x:Name="RouteTextBox"
-					BorderThickness="0">
-				</TextBox>
-			</Grid>
-		</Grid>
+    <Window.Resources>
+        <ResourceDictionary>
+            <!--We set the XAML resource-->
+            <SolidColorBrush x:Key="StatusCell"
+                             Color="Green" />
+        </ResourceDictionary>
+    </Window.Resources>
 
-		<!-- Input -->
-		<Grid 
-			Grid.Row="2" 
-			Background="Gray" 
-			ColumnDefinitions="5*,2*,*" 
-			RowDefinitions="*">
-			
-			<!-- Input File -->
-			<Grid 
-				Background="Orange" 
-				RowDefinitions="2*, 3*">
-				
-				<!-- FileName -->
-				<Label 
-					Grid.Row="0" 
-					Margin="15,5,0,0"
-					x:Name="FileNameLabel">
-				</Label>
+    <Window.Styles>
+        <!-- Input File Button (Hover) -->
+        <Style Selector="Button.inputButton:pointerover /template/ ContentPresenter">
+            <Setter
+                Property="Background"
+                Value="Red">
+            </Setter>
+            <Setter
+                Property="RenderTransform"
+                Value="scale(1.05)">
+            </Setter>
+            <Setter
+                Property="CornerRadius"
+                Value="5">
+            </Setter>
+            <Setter
+                Property="TextBox.Foreground"
+                Value="Yellow">
+            </Setter>
+        </Style>
+    </Window.Styles>
 
-				<Grid 
-					Grid.Row="1" 
-					ColumnDefinitions="*,*">
-					
-					<!-- Input File Button -->
-					<Button 
-						Grid.Column="0" 
-						Margin="15,5,0,0" 
-						HorizontalAlignment="Center"
-						Classes="inputButton"
-						Content="Browse File"
-						x:Name="BrowseFileButton"
-						Click="BrowseFileButton_Click">
-					</Button>
+    <!-- Parent -->
+    <Grid
+        RowDefinitions="72,540,108">
 
-					<!-- Visualize Button -->
-					<Button 
-						Grid.Column="1" 
-						Margin="15,5,0,0" 
-						HorizontalAlignment="Center"
-						Classes="inputButton"
-						x:Name="VisualizeButton"
-						Click="VisualizeButton_Click"
-						Content="Visualize">
-					</Button>
-				</Grid>
-			</Grid>
+        <!-- Title Bar -->
+        <Grid
+            Grid.Row="0"
+            Background="Red"
+            RowDefinitions="3*,2*"
+            VerticalAlignment="Stretch">
 
-			<!-- Algorithm Input -->
-			<Grid 
-				Grid.Column="1" 
-				RowDefinitions="*,*,*" 
-				ColumnDefinitions="*" 
-				Background="Aquamarine">
-				
-				<!-- BFS/DFS -->
-				<Grid 
-					Grid.Row="0" 
-					HorizontalAlignment="Left" >
-					
-					<Label
-						Content="Algorithm : ">
-					</Label>
-				</Grid>
-				<Grid 
-					Grid.Row="1" 
-					ColumnDefinitions="*,*" >
-					
-					<!-- BFS -->
-					<RadioButton 
-						Grid.Column="0" 
-						GroupName="Algorithm" 
-						Content="BFS" 
-						x:Name="BfsRadioButton"
-						>
-					</RadioButton>
+            <!-- Title -->
+            <Grid
+                Grid.Row="0"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center">
 
-					<!-- DFS -->
-					<RadioButton 
-						x:Name="DfsRadioButton"
-						Grid.Column="1" 
-						GroupName="Algorithm" 
-						Content="DFS">
-					</RadioButton>
+                <Label HorizontalContentAlignment="Center"
+                       FontWeight="Bold"
+                       FontFamily="Comic Sans MS"
+                       Content="TREASURE HUNTER">
+                </Label>
+            </Grid>
 
-				</Grid>
-				
-				<!-- TSP -->
-				<CheckBox 
-					Grid.Row="2" 
-					Grid.Column="0" 
-					Content="TSP"
-					x:Name="TspCheckBox">
-				</CheckBox>	
-			</Grid>
-			
-			<!-- Search -->
-			<Button 
-				x:Name="SearchButton"
-				Grid.Column="2" 
-				VerticalAlignment="Center" 
-				HorizontalAlignment="Center" 
-				Foreground="White" 
-				Background="Black"
-				Content="Search"
-				Click="SearchButton_Click">
-				
-				<!-- Command="{Binding SearchResult}"
+            <!-- Group Name -->
+            <Grid
+                Grid.Row="1"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Center">
+
+                <Label
+                    FontFamily="Comic Sans MS"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Top"
+                    Content="BY DORA THE EXPLORER">
+                </Label>
+            </Grid>
+        </Grid>
+
+        <!-- Result -->
+        <Grid
+            Grid.Row="1"
+            Background="Black"
+            ColumnDefinitions="800,*">
+
+            <!-- Maze Visualization -->
+            <Grid ShowGridLines="True"
+                  Grid.Column="0"
+                  RowDefinitions="500,*">
+
+                <StackPanel
+                    HorizontalAlignment="Center"
+                    Background="Black"
+                    Orientation="Vertical"
+                    x:Name="MazePanel" />
+
+                <!-- Slider -->
+                <Grid
+                    Background="#D6D6D6"
+                    Grid.Row="1">
+                    <Slider
+                        x:Name="MazeSlider"
+                        IsSnapToTickEnabled="True"
+                        Background="Gray"
+                        PropertyChanged="MazeSlider_OnPropertyChanged">
+                    </Slider>
+                </Grid>
+            </Grid>
+
+            <!-- Output -->
+            <Grid
+                Grid.Column="1"
+                Background="Yellow"
+                RowDefinitions="*,*,*,10*">
+
+                <!-- Execution Time (Statis) -->
+                <Label
+                    Grid.Row="0"
+                    FontFamily="Comic Sans MS"
+                    HorizontalAlignment="Left"
+                    Margin="5"
+                    x:Name="ExecutionTimeLabel">
+                </Label>
+
+                <!-- Steps (Statis) -->
+                <Label
+                    Grid.Row="1"
+                    FontFamily="Comic Sans MS"
+                    HorizontalAlignment="Left"
+                    Margin="5"
+                    x:Name="StepsLabel">
+                </Label>
+
+                <!-- Nodes (Statis) -->
+                <Label
+                    Grid.Row="2"
+                    FontFamily="Comic Sans MS"
+                    HorizontalAlignment="Left"
+                    Margin="5"
+                    x:Name="NodesLabel">
+                </Label>
+
+                <!-- Route (FlexBox) -->
+                <TextBox
+                    Grid.Row="3"
+                    FontFamily="Comic Sans MS"
+                    HorizontalAlignment="Left"
+                    Margin="5"
+                    TextWrapping="Wrap"
+                    MinWidth="210"
+                    x:Name="RouteTextBox"
+                    BorderThickness="0">
+                </TextBox>
+            </Grid>
+        </Grid>
+
+        <!-- Input -->
+        <Grid
+            Grid.Row="2"
+            Background="Gray"
+            ColumnDefinitions="5*,2*,*"
+            RowDefinitions="*">
+
+            <!-- Input File -->
+            <Grid
+                Background="Orange"
+                RowDefinitions="2*, 3*">
+
+                <!-- FileName -->
+                <Label
+                    Grid.Row="0"
+                    Margin="15,5,0,0"
+                    x:Name="FileNameLabel">
+                </Label>
+
+                <Grid
+                    Grid.Row="1"
+                    ColumnDefinitions="*,*">
+
+                    <!-- Input File Button -->
+                    <Button
+                        Grid.Column="0"
+                        Margin="15,5,0,0"
+                        HorizontalAlignment="Center"
+                        Classes="inputButton"
+                        Content="Browse File"
+                        x:Name="BrowseFileButton"
+                        Click="BrowseFileButton_Click">
+                    </Button>
+
+                    <!-- Visualize Button -->
+                    <Button
+                        Grid.Column="1"
+                        Margin="15,5,0,0"
+                        HorizontalAlignment="Center"
+                        Classes="inputButton"
+                        x:Name="VisualizeButton"
+                        Click="VisualizeButton_Click"
+                        Content="Visualize">
+                    </Button>
+                </Grid>
+            </Grid>
+
+            <!-- Algorithm Input -->
+            <Grid
+                Grid.Column="1"
+                RowDefinitions="*,*,*"
+                ColumnDefinitions="*"
+                Background="Aquamarine">
+
+                <!-- BFS/DFS -->
+                <Grid
+                    Grid.Row="0"
+                    HorizontalAlignment="Left">
+
+                    <Label
+                        Content="Algorithm : ">
+                    </Label>
+                </Grid>
+                <Grid
+                    Grid.Row="1"
+                    ColumnDefinitions="*,*">
+
+                    <!-- BFS -->
+                    <RadioButton
+                        Grid.Column="0"
+                        GroupName="Algorithm"
+                        Content="BFS"
+                        x:Name="BfsRadioButton">
+                    </RadioButton>
+
+                    <!-- DFS -->
+                    <RadioButton
+                        x:Name="DfsRadioButton"
+                        Grid.Column="1"
+                        GroupName="Algorithm"
+                        Content="DFS">
+                    </RadioButton>
+
+                </Grid>
+
+                <!-- TSP -->
+                <CheckBox
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Content="TSP"
+                    x:Name="TspCheckBox">
+                </CheckBox>
+            </Grid>
+
+            <!-- Search -->
+            <Button
+                x:Name="SearchButton"
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Foreground="White"
+                Background="Black"
+                Content="Search"
+                Click="SearchButton_Click">
+
+                <!-- Command="{Binding SearchResult}"
 				    Command="{Binding Grid, ElementName=mazeVisulaization}"-->
-			</Button>
-		</Grid>
-	</Grid>
+            </Button>
+        </Grid>
+    </Grid>
 </Window>
