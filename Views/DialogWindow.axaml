@@ -5,7 +5,8 @@
         mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="1024"
         Width="300" Height="150"
         x:Class="Tubes2_DoraTheExplorer.Views.DialogWindow"
-        Title="Notification"
+        Title="Notification"     
+        CanResize="False"
         WindowStartupLocation="CenterOwner">
         <Grid
                 RowDefinitions="*,Auto,*"

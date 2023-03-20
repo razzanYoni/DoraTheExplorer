@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Mime;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
@@ -38,7 +39,7 @@ public partial class MainWindow : Window
     public Label executionTimeLabel;
     public Label stepsLabel;
     public Label nodesLabel;
-    public Label routeLabel;
+    public TextBox routeTextBox;
 
     public string filePath;
 
@@ -86,10 +87,8 @@ public partial class MainWindow : Window
         this.nodesLabel = this.FindControl<Label>("NodesLabel");
         this.nodesLabel.Content = "Nodes : ";
 
-        this.routeLabel = this.FindControl<Label>("RouteLabel");
-        // dummy
-        this.routeLabel.Content = "Route : L-U-R-U-R-R\n" +
-                                  "U-R-D-D-D-D-D\n";
+        this.routeTextBox = this.FindControl<TextBox>("RouteTextBox");
+        this.routeTextBox.SetValue(TextBox.TextProperty, "Route : fdashooaspdfpoasjodfhaoipfhdoashfopsadhfoiashdoifpahodhasofphpoahfopaosdfhdsaohfpo");
 
         this.isNotError = false;
     }

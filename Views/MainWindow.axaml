@@ -10,6 +10,7 @@
 		x:DataType="vm:MainWindowViewModel"
         Title="Dora The Explorer"
         
+        CanResize="False"
         WindowStartupLocation="CenterScreen">
         <!-- ExtendClientAreaToDecorationsHint="True"> -->
 	
@@ -150,15 +151,16 @@
 				</Label>
 				
 				<!-- Route (FlexBox) -->
-				<Label 
+				<TextBox
 					Grid.Row="3" 
 					FontFamily="Comic Sans MS" 
 					HorizontalAlignment="Left" 
-					VerticalContentAlignment="Top"
-					HorizontalContentAlignment="Left"
 					Margin="5"
-					x:Name="RouteLabel">
-				</Label>
+					TextWrapping="Wrap"
+					MinWidth="210"
+					x:Name="RouteTextBox"
+					BorderThickness="0">
+				</TextBox>
 			</Grid>
 		</Grid>
 
