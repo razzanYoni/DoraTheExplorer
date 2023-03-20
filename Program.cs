@@ -1,16 +1,10 @@
 ﻿using Avalonia;
-using Avalonia.ReactiveUI;
 using System;
-using System.Threading.Tasks;
-using System.IO;
-using System.Linq;
 using System.Collections.Generic;
 using System.Text.Json;
 using DoraTheExplorer.Structure;
 using DoraTheExplorer.DTO;
 using DoraTheExplorer.Algorithm;
-using System.Reflection;
-using Microsoft.VisualBasic.CompilerServices;
 using Utils = DoraTheExplorer.Util.Utils;
 
 namespace DoraTheExplorer;
@@ -85,8 +79,8 @@ class Program
 
         //        var (path, states) = BFSSolver.FindPath(g, new State(new Coordinate(0, 0)), new Coordinate[] { new Coordinate(3, 1), new Coordinate(2, 4), new Coordinate(0, 5), new Coordinate(3, 5) });
         var (path, states) = BFSSolver.FindPath(g, new State(new Coordinate(0, 0)),
-            new Coordinate[] { new Coordinate(2, 1), new Coordinate(1, 3) });
-        Console.WriteLine(String.Join("-", Utils.ConvertRoute(states[0].CurrentLocation, path!)));
+            new[] { new Coordinate(2, 1), new Coordinate(1, 3) });
+        Console.WriteLine(String.Join("-", Utils.ConvertRoute(path!)));
         // path?.ToList().ForEach(e => Console.WriteLine(e));
         List<StateDTO> data = new List<StateDTO>();
         foreach (State s in states)
