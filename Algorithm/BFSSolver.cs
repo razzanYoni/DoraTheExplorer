@@ -83,7 +83,7 @@ public class BFSSolver
             statesList.Add(states);
         }
         var resPath = new List<Coordinate>();
-        var resStates = new List<State>();
+        var resStates = new List<State>(statesList[0]);
         foreach (var p in paths) resPath.AddRange(p.Skip(1));
         for (int i = 1; i < statesList.Count; i++) resStates.AddRange(statesList[i].Skip(1));
         return (resPath, resStates);
@@ -92,7 +92,7 @@ public class BFSSolver
     public static (List<Coordinate>?, List<State>) FindPath(Graph<Coordinate> graph, State initialState, Coordinate goal)
     {
         var states = new List<State>();
-        var state = initialState;
+        var state = new State(initialState);
         var q = new Queue<Vertex<Coordinate>>();
         var v = graph.Vertices.Where(e => e.Info.Equals(initialState.CurrentLocation)).FirstOrDefault(graph.Vertices[0]);
         var track = new Queue<List<Coordinate>>();
