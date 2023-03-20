@@ -28,4 +28,14 @@ public class SolutionMatrix
     {
         this.states.Add(state);
     }
+
+    public void AddTreasureLocation(Coordinate coordinate)
+    {
+        this.treasureLocations.Add(coordinate);
+    }
+
+    public void AddCell(Cell cell)
+    {
+        this.cells.Add(cell);
+    }
 }

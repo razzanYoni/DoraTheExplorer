@@ -1,126 +1,65 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.IO;
-using System.Drawing.Drawing2D;
-using System.Linq;
-using Avalonia.Controls;
-using Avalonia.Media;
-using Avalonia.Styling;
-using DoraTheExplorer.Models;
 using DoraTheExplorer.Structure;
-using DynamicData;
 
 namespace DoraTheExplorer.Util;
 
-public class ReadFromFile {
-    public static (List<List<int>>?, List<List<Vertex<Coordinate>>>?, Graph<Coordinate>?, State, List<Coordinate>?, bool) ReadFile(string path)
+public class ReadFromFile
+{
+    public static (SolutionMatrix?, Graph<Coordinate>?, bool) ReadFile(string path)
     {
-        int nK = 0;
-        int nT = 0;
         string[] lines = System.IO.File.ReadAllLines(path);
-
         int row = lines.Length;
-        for (int i = 0; i < row; i++) {
+        int col = lines[0].Replace(" ", "").Length;
+        for (int i = 0; i < row; i++)
+        {
             lines[i] = lines[i].Replace(" ", "");
+            if (lines[i].Length != col)
+            {
+                return (null, null, false);
+            }
         }
-        int col = lines[0].Length;
-        
-        List<List<Vertex<Coordinate>>> vertices = new List<List<Vertex<Coordinate>>>();
-        Vertex<Coordinate>[,] verticesArr = new Vertex<Coordinate>[row, col];
-        
-        Graph<Coordinate> graph = new Graph<Coordinate>();
-        State startState = new State(new Coordinate(-1,-1));
-        List<Coordinate>? goals = new List<Coordinate>();
+
+        var solutionMatrix = new SolutionMatrix(row, col);
+        var graph = new Graph<Coordinate>();
+        Vertex<Coordinate>[,] vertices = new Vertex<Coordinate>[row, col];
 
         int[,] matrix = new int[row, col];
 
-        for (int i = 0; i < lines.Length; i++) {
-            for (int j = 0; j < lines[i].Length; j++)
-            {
-
-                if (lines[i][j] == 'K') {
-                    // -2 : titik mulai
-                    matrix[i, j] = -2;
-                    startState = new State(new Coordinate(i, j));
-                    nK++;
-
-                    verticesArr[i, j] = new Vertex<Coordinate>(new Coordinate(i, j));
-                    if (j - 1 >= 0 && matrix[i, j - 1] == 0)
-                    {   
-                        verticesArr[i, j].ConnectLeft(verticesArr[i, j - 1]);
-                    }
-                    if (i - 1 >= 0 && matrix[i - 1, j] == 0)
-                    {
-                        verticesArr[i, j].ConnectUp(verticesArr[i - 1, j]);
-                    }
-                    graph.AddVertex(verticesArr[i, j]);
-                    
-                    if (nK > 1)
-                    {
-                        // Send Alert
-                        return (null, null, null, startState, null, false);
-                    }
-                } else if (lines[i][j] == 'R') {
-                    // 0 : Accessible
-                    matrix[i, j] = 0;
-
-                    verticesArr[i, j] = new Vertex<Coordinate>(new Coordinate(i, j));
-                    if (j - 1 >= 0 && matrix[i, j - 1] == 0)
-                    {   
-                        verticesArr[i, j].ConnectLeft(verticesArr[i, j - 1]);
-                    }
-                    if (i - 1 >= 0 && matrix[i - 1, j] == 0)
-                    {
-                        verticesArr[i, j].ConnectUp(verticesArr[i - 1, j]);
-                    }
-                    graph.AddVertex(verticesArr[i, j]);
-                }
-                else if (lines[i][j] == 'T') {
-                    // -999 : Treasure
-                    // matrix[i, j] = -999;
-                    matrix[i, j] = -999;
-
-                    verticesArr[i, j] = new Vertex<Coordinate>(new Coordinate(i, j));
-                    if (j - 1 >= 0 && matrix[i, j - 1] == 0)
-                    {   
-                        verticesArr[i, j].ConnectLeft(verticesArr[i, j - 1]);
-                    }
-                    if (i - 1 >= 0 && matrix[i - 1, j] == 0)
-                    {
-                        verticesArr[i, j].ConnectUp(verticesArr[i - 1, j]);
-                    }
-                    graph.AddVertex(verticesArr[i, j]);
-                    
-                    goals.Add(new Coordinate(i,j));
-                    nT++;
-                } else if (lines[i][j] == 'X') {
-                    // -1 : Wall
-                    matrix[i, j] = -1;
-                    
-                } else {
-                    // Invalid input
-                    // Send Alert
-                    return (null, null, null, startState, null, false);
-                }
-            }
-        }
-
-        List<List<int>> listMatrix = new List<List<int>>();
         for (int i = 0; i < row; i++)
         {
-            List<Vertex<Coordinate>> temp = new List<Vertex<Coordinate>>();
-            List<int> tempList = new List<int>();
             for (int j = 0; j < col; j++)
             {
-                temp.Add(verticesArr[i, j]);
-                tempList.Add(matrix[i,j]);
+                if (lines[i][j] != 'X')
+                {
+                    if (lines[i][j] != 'K' && lines[i][j] != 'T')
+                    {
+                        return (null, null, false);
+                    }
+                    vertices[i, j] = new Vertex<Coordinate>(new Coordinate(j, i));
+                    solutionMatrix.AddCell(new Cell(new Coordinate(j, i), true));
+                    if (j - 1 >= 0 && lines[i][j - 1] != 'X')
+                    {
+                        vertices[i, j].ConnectLeft(vertices[i, j - 1]);
+                    }
+                    if (i - 1 >= 0 && lines[i - 1][j] != 'X')
+                    {
+                        vertices[i, j].ConnectUp(vertices[i - 1, j]);
+                    }
+                    if (lines[i][j] == 'K')
+                    {
+                        solutionMatrix.AddState(new State(new Coordinate(j, i)));
+                    }
+                    if (lines[i][j] == 'T')
+                    {
+                        solutionMatrix.AddTreasureLocation(new Coordinate(j, i));
+                    }
+                    graph.AddVertex(vertices[i, j]);
+                }
+                else
+                {
+                    solutionMatrix.AddCell(new Cell(new Coordinate(i, j), false));
+                }
             }
-            vertices.Add(temp);
-            listMatrix.Add(tempList);
         }
-        
-        return (listMatrix, vertices, graph, startState, goals, true);
+        return (solutionMatrix, graph, true);
     }
 }
