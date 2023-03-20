@@ -114,7 +114,7 @@ public partial class MainWindow : Window
             // var readFromFile = new ReadFromFile();
             if (graph is not null)
             {
-                graph.vertices.Clear();
+                graph.ClearVertices();
             }
 
             (solutionMatrix, graph, isNotError) = Utils.ReadFile(result.Result[0]);
@@ -164,7 +164,7 @@ public partial class MainWindow : Window
             var cell = new Grid();
             cell.SetValue(Grid.RowProperty, startCoord.y);
             cell.SetValue(Grid.ColumnProperty, startCoord.x);
-            cell.SetValue(Grid.BackgroundProperty, Avalonia.Media.Brushes.Aquamarine);
+            cell.SetValue(Grid.BackgroundProperty, Brushes.Aquamarine);
             mazeGrid.Children.Add(cell);
 
             foreach (var c in solutionMatrix.Cells)

@@ -4,7 +4,7 @@ namespace DoraTheExplorer.Structure;
 public struct Cell
 {
     public readonly Coordinate Coord;
-    public bool Visitable;
+    public readonly bool Visitable;
 
     public Cell(Coordinate coord, bool visitable)
     {
