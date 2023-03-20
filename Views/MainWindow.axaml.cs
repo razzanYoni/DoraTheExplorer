@@ -177,14 +177,16 @@ public partial class MainWindow : Window
                 if (solutionMatrix.TreasureLocations.ToList().Any(coordinate => coordinate.Equals(coord)))
                 {
                     cell.SetValue(Grid.BackgroundProperty, Brushes.Gold);
+                    mazeGrid.Children.Add(cell);
                 }
-                else
+                else if (!c.Coord.Equals(startCoord))
                 {
                     cell.SetValue(Grid.BackgroundProperty,
-                        c.Visitable ? Brushes.Azure : Brushes.Black);
+                    c.Visitable ? Brushes.Azure : Brushes.Black);
+                    mazeGrid.Children.Add(cell);
+
                 }
 
-                mazeGrid.Children.Add(cell);
             }
             /*
             (path, states) = BFSSolver.FindPath(graph, startState, new Coordinate[] {startState.CurrentLocation});

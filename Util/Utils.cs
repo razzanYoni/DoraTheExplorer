@@ -50,7 +50,7 @@ public class Utils
             }
         }
 
-        var solutionMatrix = new SolutionMatrix(row, col);
+        var solutionMatrix = new SolutionMatrix(col, row);
         var graph = new Graph<Coordinate>();
         Vertex<Coordinate>[,] vertices = new Vertex<Coordinate>[row, col];
 
@@ -62,7 +62,7 @@ public class Utils
             {
                 if (lines[i][j] != 'X')
                 {
-                    if (lines[i][j] != 'K' && lines[i][j] != 'T')
+                    if (lines[i][j] != 'K' && lines[i][j] != 'T' && lines[i][j] != 'R')
                     {
                         return (null, null, false);
                     }
@@ -93,7 +93,7 @@ public class Utils
                 }
                 else
                 {
-                    solutionMatrix.AddCell(new Cell(new Coordinate(i, j), false));
+                    solutionMatrix.AddCell(new Cell(new Coordinate(j, i), false));
                 }
             }
         }
