@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Avalonia.Media;
 using DoraTheExplorer.Structure;
 using DynamicData;
 
@@ -130,4 +131,16 @@ public class Utils
         }
         return res.ToArray();
     }
+
+    public static ISolidColorBrush Darken(ISolidColorBrush color, double factor)
+    {
+        var r = color.Color.R;
+        var g = color.Color.G;
+        var b = color.Color.B;
+        var newR = (byte)(r * (1 - factor));
+        var newG = (byte)(g * (1 - factor));
+        var newB = (byte)(b * (1 - factor));
+        return new SolidColorBrush(Color.FromRgb(newR, newG, newB));
+    }
+    
 }
