@@ -3,59 +3,59 @@
 public class Vertex<T>
     where T : notnull
 {
-    private static int id = 0;
+    private static int _id = 0;
     public readonly int Id;
     public T Info;
-    private Vertex<T>? left;
-    private Vertex<T>? up;
-    private Vertex<T>? right;
-    private Vertex<T>? down;
+    private Vertex<T>? _left;
+    private Vertex<T>? _up;
+    private Vertex<T>? _right;
+    private Vertex<T>? _down;
 
     public Vertex(T info)
     {
         this.Info = info;
-        this.Id = id;
-        id++;
+        this.Id = _id;
+        _id++;
     }
 
     public Vertex<T>? Left
     {
-        get => left;
+        get => _left;
     }
     public Vertex<T>? Right
     {
-        get => right;
+        get => _right;
     }
     public Vertex<T>? Up
     {
-        get => up;
+        get => _up;
     }
     public Vertex<T>? Down
     {
-        get => down;
+        get => _down;
     }
 
     public void ConnectLeft(Vertex<T> left)
     {
-        this.left = left;
-        left.right = this;
+        this._left = left;
+        left._right = this;
     }
 
     public void ConnectRight(Vertex<T> right)
     {
-        this.right = right;
-        right.left = this;
+        this._right = right;
+        right._left = this;
     }
 
     public void ConnectUp(Vertex<T> up)
     {
-        this.up = up;
-        up.down = this;
+        this._up = up;
+        up._down = this;
     }
 
     public void ConnectDown(Vertex<T> down)
     {
-        this.down = down;
-        down.up = this;
+        this._down = down;
+        down._up = this;
     }
 }

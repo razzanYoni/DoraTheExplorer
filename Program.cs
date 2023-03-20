@@ -97,7 +97,7 @@ class Program
         System.Diagnostics.Debug.WriteLine("\n\n\n\n\n\n\n\n\n\n" + JsonSerializer.Serialize(data));
         System.Diagnostics.Debug.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\nMasukkk\n\n\n\n\n\n\n\n\n");
 
-        // BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.

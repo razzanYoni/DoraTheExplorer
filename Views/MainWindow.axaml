@@ -112,7 +112,8 @@
 				<Grid 
 					Grid.Row="1">
 					<Slider
-						x:Name="MazeSlider">
+						x:Name="MazeSlider"
+						PropertyChanged="MazeSlider_OnPropertyChanged">
 					</Slider>
 				</Grid>
 			</Grid>

@@ -1,21 +1,20 @@
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DoraTheExplorer.Structure;
 
 public struct State
 {
-    public List<Coordinate> VisitedLocations;
-    public List<Coordinate> BacktrackLocations;
+    public readonly List<Coordinate> VisitedLocations;
+    public readonly List<Coordinate> BacktrackLocations;
     public Coordinate CurrentLocation;
-    public List<Coordinate> SavedVisitedLocations;
+    public readonly HashSet<Coordinate> SavedVisitedLocations;
 
     public State(Coordinate currentLocation)
     {
         this.CurrentLocation = currentLocation;
         BacktrackLocations = new List<Coordinate>();
         VisitedLocations = new List<Coordinate>();
-        SavedVisitedLocations = new List<Coordinate>();
+        SavedVisitedLocations = new HashSet<Coordinate>();
     }
 
     public State(State other)
@@ -23,7 +22,7 @@ public struct State
         this.CurrentLocation = other.CurrentLocation;
         this.VisitedLocations = new List<Coordinate>(other.VisitedLocations);
         this.BacktrackLocations = new List<Coordinate>(other.BacktrackLocations);
-        this.SavedVisitedLocations = new List<Coordinate>(other.SavedVisitedLocations);
+        this.SavedVisitedLocations = new HashSet<Coordinate>(other.SavedVisitedLocations);
     }
 
     public void AddVisitedLocation(Coordinate coordinate)
