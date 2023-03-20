@@ -118,7 +118,7 @@ public partial class MainWindow : Window
                 graph.vertices.Clear();
             }
 
-            (solutionMatrix, graph, isNotError) = ReadFromFile.ReadFile(result.Result[0]);
+            (solutionMatrix, graph, isNotError) = Utils.ReadFile(result.Result[0]);
             if (!isNotError)
             {
                 // file error alert in window
@@ -227,13 +227,13 @@ public partial class MainWindow : Window
             {
                 if (this.bfsRadioButton.IsChecked == true)
                 {
-                    System.Diagnostics.Debug.WriteLine("Eksekusi bfs dengan tsp \n");
+                    Debug.WriteLine("Eksekusi bfs dengan tsp \n");
                     (path, states) = BFSSolver.FindPath(graph, solutionMatrix.States[0],
                         solutionMatrix.TreasureLocations, true);
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("Eksekusi dfs dengan tsp \n");
+                    Debug.WriteLine("Eksekusi dfs dengan tsp \n");
 
                     (path, states) = DFSSolver.FindPath(graph, solutionMatrix.States[0],
                         solutionMatrix.TreasureLocations, true);
@@ -243,7 +243,7 @@ public partial class MainWindow : Window
             {
                 if (this.bfsRadioButton.IsChecked == true)
                 {
-                    System.Diagnostics.Debug.WriteLine("Eksekusi bfs tanpa tsp \n");
+                    Debug.WriteLine("Eksekusi bfs tanpa tsp \n");
                     (path, states) = BFSSolver.FindPath(graph, solutionMatrix.States[0],
                         solutionMatrix.TreasureLocations, false);
 
@@ -251,7 +251,7 @@ public partial class MainWindow : Window
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("Eksekusi dfs tanpa tsp \n");
+                    Debug.WriteLine("Eksekusi dfs tanpa tsp \n");
 
                     (path, states) = DFSSolver.FindPath(graph, solutionMatrix.States[0],
                         solutionMatrix.TreasureLocations, false);
