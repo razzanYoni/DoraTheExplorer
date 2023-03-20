@@ -143,8 +143,6 @@ public partial class MainWindow : Window
 
     public void VisualizeButton_Click(object sender, RoutedEventArgs e)
     {
-        (_solutionMatrix, _graph, _isNotError) =
-            Utils.ReadFile("/home/msfir/Documents/Tubes/Stima/Tubes2_DoraTheExplorer/Test/tc1.txt");
         /* Visualisasi Maze */
         if (!_isNotError)
         {
@@ -265,19 +263,26 @@ public partial class MainWindow : Window
         if (mazeSlider is null || e.Property.Name != "Value" || _states is null ||
             _solutionMatrix.States.Length == 0) return;
         var idx = (int)mazeSlider.Value;
+        var row = _solutionMatrix.Height;
+        var col = _solutionMatrix.Width;
         if (idx >= _solutionMatrix.States.Length)
         {
-            foreach (var p in _path!)
+            for (var i = 0; i < row; i++)
             {
-                cells[p.y, p.x].Fill = Brushes.LightGreen;
+                for (var j = 0; j < col; j++)
+                {
+                    var loc = new Coordinate(j, i);
+                    cells[i, j].Fill = _path!.Any(coordinate => coordinate.Equals(loc))
+                        ? Utils.Darken(Brushes.LightGreen,
+                            Math.Min(0.2 * (_path!.Count(coordinate => coordinate.Equals(loc)) - 1), 0.95))
+                        : cellColors[i, j];
+                }
             }
 
             return;
         }
 
         var state = _solutionMatrix.States[idx];
-        var row = _solutionMatrix.Height;
-        var col = _solutionMatrix.Width;
         for (var i = 0; i < row; i++)
         {
             for (var j = 0; j < col; j++)

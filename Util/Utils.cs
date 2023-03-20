@@ -102,10 +102,9 @@ public class Utils
         return (solutionMatrix, graph, true);
     }
 
-    public static char[] ConvertRoute(Coordinate start, List<Coordinate> route)
+    public static char[] ConvertRoute(List<Coordinate> route)
     {
         var res = new List<char>();
-        route.Insert(0, start);
         for (int i = 0; i < route.Count - 1; i++)
         {
             var c1 = route[i];
@@ -129,10 +128,11 @@ public class Utils
                     throw new UnreachableException("Tidak mungkin ada |delta| > 1");
             }
         }
+
         return res.ToArray();
     }
 
-    public static ISolidColorBrush Darken(ISolidColorBrush color, double factor)
+    public static ISolidColorBrush Darken(ISolidColorBrush? color, double factor)
     {
         var r = color.Color.R;
         var g = color.Color.G;
@@ -142,5 +142,4 @@ public class Utils
         var newB = (byte)(b * (1 - factor));
         return new SolidColorBrush(Color.FromRgb(newR, newG, newB));
     }
-    
 }
