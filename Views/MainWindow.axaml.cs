@@ -9,7 +9,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
-using DoraTheExplorer.ViewModels;
 using DoraTheExplorer.Algorithm;
 using DoraTheExplorer.Structure;
 using DoraTheExplorer.Util;
@@ -24,7 +23,6 @@ namespace DoraTheExplorer.Views;
 
 public partial class MainWindow : Window
 {
-    public MainWindowViewModel viewModel;
 
     public RadioButton bfsRadioButton;
     public RadioButton dfsRadioButton;
@@ -40,7 +38,7 @@ public partial class MainWindow : Window
     public Label executionTimeLabel;
     public Label stepsLabel;
     public Label nodesLabel;
-    public TextBox routeTextBox;
+    public TextBlock routeTextBlock;
 
     public string filePath;
 
@@ -54,7 +52,6 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        this.viewModel = new MainWindowViewModel();
         this.bfsRadioButton = this.FindControl<RadioButton>("BfsRadioButton");
         this.bfsRadioButton.SetValue(ToggleButton.IsCheckedProperty, true);
 
@@ -88,9 +85,29 @@ public partial class MainWindow : Window
         this.nodesLabel = this.FindControl<Label>("NodesLabel");
         this.nodesLabel.Content = "Nodes : ";
 
-        this.routeTextBox = this.FindControl<TextBox>("RouteTextBox");
-        this.routeTextBox.SetValue(TextBox.TextProperty,
-            "Route : fdashooaspdfpoasjodfhaoipfhdoashfopsadhfoiashdoifpahodhasofphpoahfopaosdfhdsaohfpo");
+        this.routeTextBlock = this.FindControl<TextBlock>("RouteTextBlock");
+        this.routeTextBlock.SetValue(
+            TextBlock.TextProperty,
+            "Route : fdashooaspdfpoasjodfhaoipfhdoashfopsadhfoiashdoifpahodhasofphpoahfopaosdfhdsaohfpo" +
+            "dsfasfasdfasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "afdasfasdfasdffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffasdfasfasdf" +
+            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "dfasfasfadfdafdasfdasfasdfasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "asfdasadsgafsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "dfasfafsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
+            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf");
 
         this.isNotError = false;
     }

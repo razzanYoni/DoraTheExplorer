@@ -5,23 +5,11 @@
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>Assets\mandalorianlogo.ico</ApplicationIcon>
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <Folder Include="Algorithm" />
-    <Folder Include="DTO" />
-    <Folder Include="Models" />
-    <Folder Include="Result" />
-    <Folder Include="Structure" />
-    <AvaloniaResources Include="Assets\**" />
+    <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Assets\mandalorianlogo.ico" />
-  </ItemGroup>
-
   <ItemGroup>
     <TrimmerRootAssembly Include="Avalonia.Themes.Fluent" />
   </ItemGroup>
@@ -32,7 +20,6 @@
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.18" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.18" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="XamlNameReferenceGenerator" Version="1.6.1" />
   </ItemGroup>
 </Project>
