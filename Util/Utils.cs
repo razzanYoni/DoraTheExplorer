@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Avalonia.Media;
 using DoraTheExplorer.Structure;
 using DynamicData;
 
@@ -102,9 +101,10 @@ public class Utils
         return (solutionMatrix, graph, true);
     }
 
-    public static char[] ConvertRoute(List<Coordinate> route)
+    public static char[] ConvertRoute(Coordinate start, List<Coordinate> route)
     {
         var res = new List<char>();
+        route.Insert(0, start);
         for (int i = 0; i < route.Count - 1; i++)
         {
             var c1 = route[i];
@@ -129,18 +129,6 @@ public class Utils
                     break;
             }
         }
-
         return res.ToArray();
-    }
-
-    public static ISolidColorBrush Darken(ISolidColorBrush? color, double factor)
-    {
-        var r = color.Color.R;
-        var g = color.Color.G;
-        var b = color.Color.B;
-        var newR = (byte)(r * (1 - factor));
-        var newG = (byte)(g * (1 - factor));
-        var newB = (byte)(b * (1 - factor));
-        return new SolidColorBrush(Color.FromRgb(newR, newG, newB));
     }
 }

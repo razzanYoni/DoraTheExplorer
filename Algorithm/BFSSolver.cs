@@ -7,23 +7,23 @@ namespace DoraTheExplorer.Algorithm;
 
 public class BFSSolver
 {
-    public static void BFS<T>(Graph<T> graph, T startVertexInfo) where T : IEquatable<T>
+    public static void BFS<T>(Graph<T> graph, T startVertexInfo) where T : notnull, IEquatable<T>
     {
         var vertices = graph.Vertices;
         if (vertices.Length == 0) return;
         var visited = new HashSet<int>();
         var start = vertices.Where(e => e.Info.Equals(startVertexInfo)).FirstOrDefault(vertices[0]);
-        BFSImpl<T>(visited, start);
+        BFSImpl<T>(graph, visited, start);
     }
 
-    private static void BFSImpl<T>(HashSet<int> visited, Vertex<T> start) where T : notnull
+    private static void BFSImpl<T>(Graph<T> graph, HashSet<int> visited, Vertex<T> start) where T : notnull
     {
         var q = new Queue<Vertex<T>>();
         q.Enqueue(start);
         visited.Add(start.Id);
         while (q.Count > 0)
         {
-            var v = q.Dequeue();
+            Vertex<T> v = q.Dequeue();
             Console.Write(v.Info + " ");
 
             if (v.Right is not null && !visited.Contains(v.Right.Id))
@@ -31,19 +31,16 @@ public class BFSSolver
                 q.Enqueue(v.Right);
                 visited.Add(v.Right.Id);
             }
-
             if (v.Down is not null && !visited.Contains(v.Down.Id))
             {
                 q.Enqueue(v.Down);
                 visited.Add(v.Down.Id);
             }
-
             if (v.Left is not null && !visited.Contains(v.Left.Id))
             {
                 q.Enqueue(v.Left);
                 visited.Add(v.Left.Id);
             }
-
             if (v.Up is not null && !visited.Contains(v.Up.Id))
             {
                 q.Enqueue(v.Up);
@@ -52,8 +49,7 @@ public class BFSSolver
         }
     }
 
-    public static (List<Coordinate>?, List<State>) FindPath(Graph<Coordinate> graph, State initialState,
-        Coordinate[] goals, bool tsp = false)
+    public static (List<Coordinate>?, List<State>) FindPath(Graph<Coordinate> graph, State initialState, Coordinate[] goals, bool tsp = false)
     {
         Coordinate start = initialState.CurrentLocation;
         var state = new State(initialState);
@@ -75,35 +71,30 @@ public class BFSSolver
                     shortestGoal = goal;
                 }
             }
-
             if (shortestPath is not null) paths.Add(shortestPath);
             statesList.Add(shortestStates);
             state = new State(shortestStates.Last());
             goalSet.Remove(shortestGoal);
         }
-
         if (tsp)
         {
             var (path, states) = FindPath(graph, new State(state), start);
             if (path is not null) paths.Add(path);
             statesList.Add(states);
         }
-
-        var resPath = new List<Coordinate>(paths.First());
-        var resStates = new List<State>(statesList.First());
-        for (var i = 1; i < paths.Count; i++) resPath.AddRange(paths[i].Skip(1));
-        for (var i = 1; i < statesList.Count; i++) resStates.AddRange(statesList[i].Skip(1));
+        var resPath = new List<Coordinate>();
+        var resStates = new List<State>(statesList[0]);
+        foreach (var p in paths) resPath.AddRange(p.Skip(1));
+        for (int i = 1; i < statesList.Count; i++) resStates.AddRange(statesList[i].Skip(1));
         return (resPath, resStates);
     }
 
-    public static (List<Coordinate>?, List<State>) FindPath(Graph<Coordinate> graph, State initialState,
-        Coordinate goal)
+    public static (List<Coordinate>?, List<State>) FindPath(Graph<Coordinate> graph, State initialState, Coordinate goal)
     {
         var states = new List<State>();
         var state = new State(initialState);
         var q = new Queue<Vertex<Coordinate>>();
-        var v = graph.Vertices.Where(e => e.Info.Equals(initialState.CurrentLocation))
-            .FirstOrDefault(graph.Vertices[0]);
+        var v = graph.Vertices.Where(e => e.Info.Equals(initialState.CurrentLocation)).FirstOrDefault(graph.Vertices[0]);
         var track = new Queue<List<Coordinate>>();
         var t = new List<Coordinate>();
         var path = new List<Coordinate>();
@@ -111,7 +102,7 @@ public class BFSSolver
         t.Add(v.Info);
         track.Enqueue(new List<Coordinate>(t));
         // backtrack
-        var backtrack = false;
+        bool backtrack = false;
         var savedVisitedLocs = new List<Coordinate>();
         while (q.Count > 0)
         {
@@ -124,10 +115,8 @@ public class BFSSolver
                 path = t;
                 break;
             }
-
             bool blocked = true;
-            if (v.Right is not null && !state.VisitedLocations.Contains(v.Right.Info) &&
-                !state.BacktrackLocations.Contains(v.Right.Info))
+            if (v.Right is not null && !state.VisitedLocations.Contains(v.Right.Info) && !state.BacktrackLocations.Contains(v.Right.Info))
             {
                 var curTrack = new List<Coordinate>(t);
                 q.Enqueue(v.Right);
@@ -135,9 +124,7 @@ public class BFSSolver
                 track.Enqueue(curTrack);
                 blocked = false;
             }
-
-            if (v.Down is not null && !state.VisitedLocations.Contains(v.Down.Info) &&
-                !state.BacktrackLocations.Contains(v.Down.Info))
+            if (v.Down is not null && !state.VisitedLocations.Contains(v.Down.Info) && !state.BacktrackLocations.Contains(v.Down.Info))
             {
                 var curTrack = new List<Coordinate>(t);
                 q.Enqueue(v.Down);
@@ -145,9 +132,7 @@ public class BFSSolver
                 track.Enqueue(curTrack);
                 blocked = false;
             }
-
-            if (v.Left is not null && !state.VisitedLocations.Contains(v.Left.Info) &&
-                !state.BacktrackLocations.Contains(v.Left.Info))
+            if (v.Left is not null && !state.VisitedLocations.Contains(v.Left.Info) && !state.BacktrackLocations.Contains(v.Left.Info))
             {
                 var curTrack = new List<Coordinate>(t);
                 q.Enqueue(v.Left);
@@ -155,9 +140,7 @@ public class BFSSolver
                 track.Enqueue(curTrack);
                 blocked = false;
             }
-
-            if (v.Up is not null && !state.VisitedLocations.Contains(v.Up.Info) &&
-                !state.BacktrackLocations.Contains(v.Up.Info))
+            if (v.Up is not null && !state.VisitedLocations.Contains(v.Up.Info) && !state.BacktrackLocations.Contains(v.Up.Info))
             {
                 var curTrack = new List<Coordinate>(t);
                 q.Enqueue(v.Up);
@@ -165,11 +148,10 @@ public class BFSSolver
                 track.Enqueue(curTrack);
                 blocked = false;
             }
-
             if (blocked && q.Count == 0)
             {
-                savedVisitedLocs.Add(state.VisitedLocations.Last());
-                state.RemoveLatestVisitedLocation();
+                savedVisitedLocs.Add(state.VisitedLocations.First());
+                state.RemoveEarliestVisitedLocation();
                 q.Enqueue(v);
                 track.Enqueue(t);
                 backtrack = true;
@@ -187,7 +169,6 @@ public class BFSSolver
                 state.AddVisitedLocation(v.Info);
             }
         }
-
         return (path.Count > 0 ? path : null, states);
     }
 }

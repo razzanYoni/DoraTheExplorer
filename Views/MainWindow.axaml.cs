@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Mime;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -20,6 +20,7 @@ namespace DoraTheExplorer.Views;
 // TODO : Slider SHow solution path 
 // TODO : Counter untuk alpha
 
+
 public partial class MainWindow : Window
 {
 
@@ -32,23 +33,20 @@ public partial class MainWindow : Window
     public Button visualizeButton;
     public Button searchButton;
 
-    private StackPanel mazePanel;
-    private StackPanel[] mazeRows;
-    private Rectangle[,] cells;
-    private ISolidColorBrush[,] cellColors;
-    public Slider? mazeSlider;
+    public Grid mazeGrid;
+    public Slider mazeSlider;
     public Label executionTimeLabel;
     public Label stepsLabel;
     public Label nodesLabel;
     public TextBlock routeTextBlock;
 
-    public string FilePath;
+    public string filePath;
 
-    private Graph<Coordinate>? _graph;
-    private List<Coordinate>? _path;
-    private List<State>? _states;
-    private bool _isNotError;
-    private SolutionMatrix _solutionMatrix;
+    private Graph<Coordinate>? graph;
+    private List<Coordinate>? path;
+    private List<State>? states;
+    private bool isNotError;
+    private SolutionMatrix solutionMatrix;
 
     public MainWindow()
     {
@@ -70,7 +68,8 @@ public partial class MainWindow : Window
 
         this.searchButton = this.FindControl<Button>("SearchButton");
 
-        this.mazePanel = this.FindControl<StackPanel>("MazePanel");
+        this.mazeGrid = this.FindControl<Grid>("MazeGrid");
+        this.mazeGrid.Background = Brushes.Black;
 
         this.mazeSlider = this.FindControl<Slider>("MazeSlider");
         this.mazeSlider.Orientation = Orientation.Horizontal;
@@ -110,7 +109,7 @@ public partial class MainWindow : Window
             "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
             "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf");
 
-        this._isNotError = false;
+        this.isNotError = false;
     }
 
     public void BrowseFileButton_Click(object sender, RoutedEventArgs e)
@@ -122,23 +121,23 @@ public partial class MainWindow : Window
         if (result.Result != null)
         {
             // path file : result.Result[0]
-            Debug.WriteLine(result.Result[0]);
+            System.Diagnostics.Debug.WriteLine(result.Result[0]);
 
             // Show File Name in Window
             this.fileNameLabel.Content =
                 "Filename : " + result.Result[0].Substring(result.Result[0].LastIndexOf('\\') + 1);
 
-            this.FilePath = result.Result[0];
+            this.filePath = result.Result[0];
 
             /* Read File */
             // var readFromFile = new ReadFromFile();
-            if (_graph is not null)
+            if (graph is not null)
             {
-                _graph.ClearVertices();
+                graph.ClearVertices();
             }
 
-            (_solutionMatrix, _graph, _isNotError) = Utils.ReadFile(result.Result[0]);
-            if (!_isNotError)
+            (solutionMatrix, graph, isNotError) = Utils.ReadFile(result.Result[0]);
+            if (!isNotError)
             {
                 // file error alert in window
                 Debug.WriteLine("File Error");
@@ -161,85 +160,105 @@ public partial class MainWindow : Window
     public void VisualizeButton_Click(object sender, RoutedEventArgs e)
     {
         /* Visualisasi Maze */
-        if (!_isNotError)
+        if (isNotError)
+        {
+            int row = solutionMatrix.Height;
+            int col = solutionMatrix.Width;
+
+            mazeGrid.RowDefinitions.Clear();
+            mazeGrid.ColumnDefinitions.Clear();
+
+            for (int i = 0; i < row; i++)
+            {
+                mazeGrid.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star));
+            }
+
+            for (int j = 0; j < col; j++)
+            {
+                mazeGrid.ColumnDefinitions.Add(new ColumnDefinition(1, GridUnitType.Star));
+            }
+
+            // start cell
+            var startCoord = solutionMatrix.States[0].CurrentLocation;
+            var cell = new Grid();
+            cell.SetValue(Grid.RowProperty, startCoord.y);
+            cell.SetValue(Grid.ColumnProperty, startCoord.x);
+            cell.SetValue(Grid.BackgroundProperty, Brushes.Aquamarine);
+            mazeGrid.Children.Add(cell);
+
+            foreach (var c in solutionMatrix.Cells)
+            {
+                cell = new Grid();
+                var coord = c.Coord;
+                cell.SetValue(Grid.RowProperty, coord.y);
+                cell.SetValue(Grid.ColumnProperty, coord.x);
+                if (solutionMatrix.TreasureLocations.ToList().Any(coordinate => coordinate.Equals(coord)))
+                {
+                    cell.SetValue(Grid.BackgroundProperty, Brushes.Gold);
+                    mazeGrid.Children.Add(cell);
+                }
+                else if (!c.Coord.Equals(startCoord))
+                {
+                    cell.SetValue(Grid.BackgroundProperty,
+                        c.Visitable ? Brushes.Azure : Brushes.Black);
+                    mazeGrid.Children.Add(cell);
+                }
+            }
+            /*
+            (path, states) = BFSSolver.FindPath(graph, startState, new Coordinate[] {startState.CurrentLocation});
+            /* Do something #1#
+            List<StateDTO> data = new List<StateDTO>();
+            foreach (State s in states)
+            {
+                data.Add(StateDTO.From(s));
+            }
+
+            var jsonResult = JsonSerializer.Serialize(data);
+
+            path.Clear();
+            states.Clear();*/
+        }
+        else
         {
             var alert = new DialogWindow("File Belum Ada");
+
             alert.ShowDialog(this);
-            return;
-        }
-
-        var row = _solutionMatrix!.Height;
-        var col = _solutionMatrix.Width;
-        mazeRows = new StackPanel[row];
-        cells = new Rectangle[row, col];
-        cellColors = new ISolidColorBrush[row, col];
-        var size = Math.Min(500 / row, 800 / col);
-
-        mazePanel.Children.Clear();
-        for (var i = 0; i < row; i++)
-        {
-            mazeRows[i] = new StackPanel
-            {
-                Orientation = Orientation.Horizontal
-            };
-            for (var j = 0; j < col; j++)
-            {
-                cells[i, j] = new Rectangle
-                {
-                    Width = size,
-                    Height = size,
-                    Stroke = Brushes.Black,
-                    StrokeThickness = 1
-                };
-                mazeRows[i].Children.Add(cells[i, j]);
-            }
-
-            mazePanel.Children.Add(mazeRows[i]);
-        }
-
-        // start cell
-        var startCoord = _solutionMatrix.States[0].CurrentLocation;
-        cells[startCoord.y, startCoord.x].Fill = Brushes.Aquamarine;
-        cellColors[startCoord.y, startCoord.x] = Brushes.Aquamarine;
-
-        foreach (var c in _solutionMatrix.Cells)
-        {
-            var coord = c.Coord;
-            if (_solutionMatrix.TreasureLocations.ToList().Any(coordinate => coordinate.Equals(coord)))
-            {
-                cellColors[coord.y, coord.x] = Brushes.Gold;
-                cells[coord.y, coord.x].Fill = cellColors[coord.y, coord.x];
-            }
-            else if (!c.Coord.Equals(startCoord))
-            {
-                cellColors[coord.y, coord.x] = c.Visitable ? Brushes.Azure : Brushes.Black;
-                cells[coord.y, coord.x].Fill = cellColors[coord.y, coord.x];
-            }
         }
     }
 
     public void SearchButton_Click(object sender, RoutedEventArgs e)
     {
         /* Run Time */
-        if ((_isNotError) && (_graph is not null) && (_solutionMatrix.TreasureLocations.Length != 0))
+        if ((isNotError) && (graph is not null) && (solutionMatrix.TreasureLocations.Length != 0))
         {
-            _path?.Clear();
-            _states?.Clear();
+            if (path is not null)
+            {
+                path.Clear();
+            }
+
+            if (states is not null)
+            {
+                states.Clear();
+            }
 
             if (this.tspCheckBox.IsChecked == true)
             {
                 if (this.bfsRadioButton.IsChecked == true)
                 {
                     Debug.WriteLine("Eksekusi bfs dengan tsp \n");
-                    (_path, _states) = BFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
-                        _solutionMatrix.TreasureLocations, true);
+                    (path, states) = BFSSolver.FindPath(graph, solutionMatrix.States[0],
+                        solutionMatrix.TreasureLocations, true);
+                    this.mazeSlider.Maximum = states.Count;
+                    this.solutionMatrix.SetStates(states);
                 }
                 else
                 {
                     Debug.WriteLine("Eksekusi dfs dengan tsp \n");
 
-                    (_path, _states) = DFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
-                        _solutionMatrix.TreasureLocations, true);
+                    (path, states) = DFSSolver.FindPath(graph, solutionMatrix.States[0],
+                        solutionMatrix.TreasureLocations, true);
+                    this.mazeSlider.Maximum = states.Count;
+                    this.solutionMatrix.SetStates(states);
                 }
             }
             else
@@ -247,26 +266,28 @@ public partial class MainWindow : Window
                 if (this.bfsRadioButton.IsChecked == true)
                 {
                     Debug.WriteLine("Eksekusi bfs tanpa tsp \n");
-                    (_path, _states) = BFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
-                        _solutionMatrix.TreasureLocations);
+                    (path, states) = BFSSolver.FindPath(graph, solutionMatrix.States[0],
+                        solutionMatrix.TreasureLocations, false);
+
+                    this.mazeSlider.Maximum = states.Count;
+                    this.solutionMatrix.SetStates(states);
                 }
                 else
                 {
                     Debug.WriteLine("Eksekusi dfs tanpa tsp \n");
 
-                    (_path, _states) = DFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
-                        _solutionMatrix.TreasureLocations);
+                    (path, states) = DFSSolver.FindPath(graph, solutionMatrix.States[0],
+                        solutionMatrix.TreasureLocations, false);
+
+                    this.mazeSlider.Maximum = states.Count;
+                    this.solutionMatrix.SetStates(states);
                 }
             }
-
-            this.mazeSlider!.Maximum = _states.Count;
-            this.mazeSlider.TickFrequency = 1;
-            this._solutionMatrix.SetStates(_states);
         }
         else
         {
             // send alert
-            Debug.WriteLine("Belum ada file\n");
+            System.Diagnostics.Debug.WriteLine("Belum ada file\n");
             // show dialog alert
             var alert = new DialogWindow("Belum ada file");
 
@@ -276,53 +297,28 @@ public partial class MainWindow : Window
 
     private void MazeSlider_OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
-        mazeSlider = sender as Slider;
-        if (mazeSlider is null || e.Property.Name != "Value" || _states is null ||
-            _solutionMatrix.States.Length == 0) return;
-        var idx = (int)mazeSlider.Value;
-        var row = _solutionMatrix.Height;
-        var col = _solutionMatrix.Width;
-        if (idx >= _solutionMatrix.States.Length)
+        mazeSlider = (Slider)sender;
+        if (mazeSlider is not null && e.Property.Name == "Value" && states is not null &&
+            solutionMatrix.States.Length != 0)
         {
-            for (var i = 0; i < row; i++)
+            int idx = (int)mazeSlider.Value;
+            State state = solutionMatrix.States[idx];
+            Grid? cell;
+            foreach (var visited in state.VisitedLocations.Concat(state.SavedVisitedLocations))
             {
-                for (var j = 0; j < col; j++)
-                {
-                    var loc = new Coordinate(j, i);
-                    cells[i, j].Fill = _path!.Any(coordinate => coordinate.Equals(loc))
-                        ? Utils.Darken(Brushes.LightGreen,
-                            Math.Min(0.2 * (_path!.Count(coordinate => coordinate.Equals(loc)) - 1), 0.95))
-                        : cellColors[i, j];
-                }
+                cell = new Grid();
+                cell.SetValue(Grid.RowProperty, visited.y);
+                cell.SetValue(Grid.ColumnProperty, visited.x);
+                cell.SetValue(Panel.BackgroundProperty, Brushes.Yellow);
+                mazeGrid.Children.Add(cell);
             }
 
-            return;
-        }
-
-        var state = _solutionMatrix.States[idx];
-        for (var i = 0; i < row; i++)
-        {
-            for (var j = 0; j < col; j++)
-            {
-                var loc = new Coordinate(j, i);
-                if (state.CurrentLocation.Equals(loc))
-                {
-                    cells[i, j].Fill = Brushes.Blue;
-                }
-                else if (state.BacktrackLocations.ToList().Any(coordinate => coordinate.Equals(loc)))
-                {
-                    cells[i, j].Fill = Brushes.Red;
-                }
-                else if (state.VisitedLocations.ToList().Concat(state.SavedVisitedLocations)
-                         .Any(coordinate => coordinate.Equals(loc)))
-                {
-                    cells[i, j].Fill = Brushes.Yellow;
-                }
-                else
-                {
-                    cells[i, j].Fill = cellColors[i, j];
-                }
-            }
+            var current = state.CurrentLocation;
+            cell = new Grid();
+            cell.SetValue(Grid.RowProperty, current.y);
+            cell.SetValue(Grid.ColumnProperty, current.x);
+            cell.SetValue(Panel.BackgroundProperty, Brushes.Blue);
+            mazeGrid.Children.Add(cell);
         }
     }
 }
