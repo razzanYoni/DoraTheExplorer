@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -49,14 +51,16 @@ public partial class MainWindow : Window
     private List<State>? _states;
     private bool _isNotError;
     private SolutionMatrix _solutionMatrix;
+    private bool _isPlayed;
 
     public MainWindow()
     {
         InitializeComponent();
 
+
         this.bfsRadioButton = this.FindControl<RadioButton>("BfsRadioButton");
         this.bfsRadioButton.SetValue(ToggleButton.IsCheckedProperty, true);
-
+        
         this.dfsRadioButton = this.FindControl<RadioButton>("DfsRadioButton");
 
         this.tspCheckBox = this.FindControl<CheckBox>("TspCheckBox");
@@ -89,26 +93,7 @@ public partial class MainWindow : Window
         this.routeTextBlock = this.FindControl<TextBlock>("RouteTextBlock");
         this.routeTextBlock.SetValue(
             TextBlock.TextProperty,
-            "Route : fdashooaspdfpoasjodfhaoipfhdoashfopsadhfoiashdoifpahodhasofphpoahfopaosdfhdsaohfpo" +
-            "dsfasfasdfasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "afdasfasdfasdffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffasdfasfasdf" +
-            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "dfasfasfadfdafdasfdasfasdfasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "asfdasadsgafsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "dfasfafsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf" +
-            "fsadfasdfasdfasdfadsfasdfasdfasdfadsfdasffsadfasdfasdfasdfadsfasdfasdfasdfadsfdasf");
+            "Route : ");
 
         this._isNotError = false;
     }
@@ -158,16 +143,8 @@ public partial class MainWindow : Window
         }
     }
 
-    public void VisualizeButton_Click(object sender, RoutedEventArgs e)
+    private void Visualize()
     {
-        /* Visualisasi Maze */
-        if (!_isNotError)
-        {
-            var alert = new DialogWindow("File Belum Ada");
-            alert.ShowDialog(this);
-            return;
-        }
-
         var row = _solutionMatrix!.Height;
         var col = _solutionMatrix.Width;
         mazeRows = new StackPanel[row];
@@ -218,6 +195,19 @@ public partial class MainWindow : Window
         }
     }
 
+    public void VisualizeButton_Click(object sender, RoutedEventArgs e)
+    {
+        /* Visualisasi Maze */
+        if (!_isNotError)
+        {
+            var alert = new DialogWindow("File Belum Ada");
+            alert.ShowDialog(this);
+            return;
+        }
+        
+        Visualize(); 
+    }
+
     public void SearchButton_Click(object sender, RoutedEventArgs e)
     {
         /* Run Time */
@@ -225,7 +215,11 @@ public partial class MainWindow : Window
         {
             _path?.Clear();
             _states?.Clear();
-
+            
+            Visualize();
+            // stopwatch.Start();
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            watch.Start();
             if (this.tspCheckBox.IsChecked == true)
             {
                 if (this.bfsRadioButton.IsChecked == true)
@@ -258,9 +252,15 @@ public partial class MainWindow : Window
                         _solutionMatrix.TreasureLocations);
                 }
             }
+            watch.Stop();
+            TimeSpan elapsedMs = watch.Elapsed;
+            this.executionTimeLabel.Content = "Time : " + elapsedMs.TotalMilliseconds + " ms";
+            this.routeTextBlock.Text = "Route : " + String.Join("-", Utils.ConvertRoute(_path));
+            this.stepsLabel.Content = "Steps : " + (_path.Count - 1);
+            this.nodesLabel.Content = "Nodes : " + _states.Count;
 
             this.mazeSlider!.Maximum = _states.Count;
-            this.mazeSlider.TickFrequency = 1;
+            this.mazeSlider.Value = _states.Count;
             this._solutionMatrix.SetStates(_states);
         }
         else
@@ -325,4 +325,38 @@ public partial class MainWindow : Window
             }
         }
     }
+
+    private async void PlayButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (this._states is null || this._states.Count == 0 || this.mazeSlider.Value == this.mazeSlider.Maximum) return;
+        _isPlayed = true;
+        
+        while (_isPlayed && this.mazeSlider.Value < this.mazeSlider.Maximum)
+        {
+            await WorkAsync();
+            this.mazeSlider.Value += 1;
+        }
+        _isPlayed = false;
+    }
+    
+    public void PauseButton_Click(object sender, RoutedEventArgs e)
+    {
+        _isPlayed = false;
+    }
+    
+    private void ResetButton_Click(object sender, RoutedEventArgs e)
+    {
+        _isPlayed = false;
+        this.mazeSlider.Value = 0;
+    }
+
+    private Task WorkAsync()
+    {
+        if (!_isPlayed) return Task.CompletedTask;
+        return Task.Run(() =>
+        {
+            Thread.Sleep(200);
+        });
+    }
+    
 }

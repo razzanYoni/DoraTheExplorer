@@ -3,7 +3,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:vm="using:DoraTheExplorer.ViewModels"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:maze="clr-namespace:DoraTheExplorer.Models;assembly=Tubes3_DoraTheExplorer"
         mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="1024"
         x:Class="DoraTheExplorer.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -11,11 +10,11 @@
         Width="1024"
         Height="720"
 
+        Icon="\Assets\mandalorianlogo.ico"
         CanResize="False"
         WindowStartupLocation="CenterScreen">
     <!-- ExtendClientAreaToDecorationsHint="True"> -->
 
-    <!-- Icon="..\..\..\Assets\mandalorianlogo.ico" Logo tapi error-->
     <!-- TODO : Atur Font Size biar relative, Binding Matrix dan Slider, Color Palette-->
 
     <Design.DataContext>
@@ -69,11 +68,13 @@
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center">
 
-                <Label HorizontalContentAlignment="Center"
-                       FontWeight="Bold"
-                       FontFamily="Comic Sans MS"
-                       Content="TREASURE HUNTER">
-                </Label>
+                <Image
+                    Source="/Assets/mandalorian-logo.png"></Image>
+                <!-- <Label HorizontalContentAlignment="Center" -->
+                <!--        FontWeight="Bold" -->
+                <!--        FontFamily="Comic Sans MS" -->
+                <!--        Content="TREASURE HUNTER"> -->
+                <!-- </Label> -->
             </Grid>
 
             <!-- Group Name -->
@@ -111,8 +112,36 @@
                 <!-- Slider -->
                 <Grid
                     Background="#D6D6D6"
-                    Grid.Row="1">
+                    Grid.Row="1"
+                    ColumnDefinitions="*,*,*,15*"
+                    VerticalAlignment="Center">
+                    <Button
+                        Grid.Column="0"
+                        Margin="2 -1 -1 -1"
+                        Click="PlayButton_Click"
+                        Background="Transparent">
+                        <PathIcon
+                            Data="{StaticResource play_regular}"></PathIcon>
+                    </Button>
+                    <Button
+                        Grid.Column="1"
+                        Margin="-1 -1 -1 -1"
+                        Background="Transparent"
+                        Click="PauseButton_Click">
+                        <PathIcon
+                            Data="{StaticResource pause_regular}"></PathIcon>
+                    </Button>
+                    <Button
+                        Grid.Column="2"
+                        Margin="-1 -1 -1 -1"
+                        Background="Transparent"
+                        Click="ResetButton_Click">
+                        <Image
+                                Source="{SvgImage /Assets/reset-button.svg}"></Image>
+                    </Button>
                     <Slider
+                        VerticalAlignment="Top"
+                        Grid.Column="3"
                         x:Name="MazeSlider"
                         IsSnapToTickEnabled="True"
                         Background="Gray"
