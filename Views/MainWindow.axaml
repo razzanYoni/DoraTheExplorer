@@ -112,12 +112,14 @@
 
                 <!-- Slider -->
                 <Grid
-                    Background="#D6D6D6"
+                    Background="#ffc500"
+                    
                     Grid.Row="1">
                     <Slider
                         x:Name="MazeSlider"
                         IsSnapToTickEnabled="True"
-                        Background="Gray"
+                        Background="#ff7f00"
+                        Foreground="Green"
                         PropertyChanged="MazeSlider_OnPropertyChanged">
                     </Slider>
                 </Grid>
@@ -236,6 +238,9 @@
                     HorizontalAlignment="Left">
 
                     <Label
+                        FontSize="20"
+                        Height="30"
+                        FontFamily="Corbel"
                         Content="Algorithm : ">
                     </Label>
                 </Grid>
@@ -248,6 +253,8 @@
                         Grid.Column="0"
                         GroupName="Algorithm"
                         Content="BFS"
+                        FontFamily="Corbel"
+                        FontSize="20"
                         x:Name="BfsRadioButton">
                     </RadioButton>
 
@@ -256,6 +263,8 @@
                         x:Name="DfsRadioButton"
                         Grid.Column="1"
                         GroupName="Algorithm"
+                        FontFamily="Corbel"
+                        FontSize="20"
                         Content="DFS">
                     </RadioButton>
 
@@ -266,6 +275,8 @@
                     Grid.Row="2"
                     Grid.Column="0"
                     Content="TSP"
+                    FontFamily="Corbel"
+                    FontSize="20"
                     x:Name="TspCheckBox">
                 </CheckBox>
             </Grid>
