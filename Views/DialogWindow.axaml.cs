@@ -2,7 +2,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
 
 namespace Tubes2_DoraTheExplorer.Views;
 

@@ -125,7 +125,8 @@ public class Utils
                     res.Add('D');
                     break;
                 default:
-                    throw new UnreachableException("Tidak mungkin ada |delta| > 1");
+                    // throw new UnreachableException("Tidak mungkin ada |delta| > 1");
+                    break;
             }
         }
 
