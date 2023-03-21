@@ -72,6 +72,7 @@
                 <Label HorizontalContentAlignment="Center"
                        FontWeight="Bold"
                        FontFamily="Comic Sans MS"
+                       FontSize="30"
                        Content="TREASURE HUNTER">
                 </Label>
                 
@@ -238,9 +239,10 @@
                     HorizontalAlignment="Left">
 
                     <Label
-                        FontSize="20"
-                        Height="30"
+                        FontSize="18"
+                        Height="27"
                         FontFamily="Corbel"
+                        FontWeight="ExtraBold"
                         Content="Algorithm : ">
                     </Label>
                 </Grid>
@@ -254,7 +256,8 @@
                         GroupName="Algorithm"
                         Content="BFS"
                         FontFamily="Corbel"
-                        FontSize="20"
+                        FontSize="16"
+                        FontWeight="Heavy"
                         x:Name="BfsRadioButton">
                     </RadioButton>
 
@@ -264,7 +267,8 @@
                         Grid.Column="1"
                         GroupName="Algorithm"
                         FontFamily="Corbel"
-                        FontSize="20"
+                        FontSize="16"
+                        FontWeight="Heavy"
                         Content="DFS">
                     </RadioButton>
 
@@ -276,7 +280,8 @@
                     Grid.Column="0"
                     Content="TSP"
                     FontFamily="Corbel"
-                    FontSize="20"
+                    FontSize="16"
+                    FontWeight="Heavy"
                     x:Name="TspCheckBox">
                 </CheckBox>
             </Grid>
