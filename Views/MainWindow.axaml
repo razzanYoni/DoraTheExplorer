@@ -155,16 +155,18 @@
                 </Label>
 
                 <!-- Route (FlexBox) -->
-                <TextBox
-                    Grid.Row="3"
-                    FontFamily="Comic Sans MS"
-                    HorizontalAlignment="Left"
-                    Margin="5"
-                    TextWrapping="Wrap"
-                    MinWidth="210"
-                    x:Name="RouteTextBox"
-                    BorderThickness="0">
-                </TextBox>
+                <ScrollViewer
+					Grid.Row="3">
+				<TextBlock
+					FontFamily="Comic Sans MS" 
+					HorizontalAlignment="Left" 
+					Margin="5"
+					TextWrapping="Wrap"
+					MinWidth="210"
+					x:Name="RouteTextBlock"
+					>
+				</TextBlock>
+				</ScrollViewer>
             </Grid>
         </Grid>
 
