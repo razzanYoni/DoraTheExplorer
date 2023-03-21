@@ -333,8 +333,8 @@ public partial class MainWindow : Window
         
         while (_isPlayed && this.mazeSlider.Value < this.mazeSlider.Maximum)
         {
-            await WorkAsync();
             this.mazeSlider.Value += 1;
+            await WorkAsync();
         }
         _isPlayed = false;
     }
