@@ -35,7 +35,7 @@
         <Style Selector="Button.inputButton:pointerover /template/ ContentPresenter">
             <Setter
                 Property="Background"
-                Value="Red">
+                Value="#ae487f">
             </Setter>
             <Setter
                 Property="RenderTransform"
@@ -47,7 +47,7 @@
             </Setter>
             <Setter
                 Property="TextBox.Foreground"
-                Value="Yellow">
+                Value="White">
             </Setter>
         </Style>
     </Window.Styles>
@@ -59,7 +59,7 @@
         <!-- Title Bar -->
         <Grid
             Grid.Row="0"
-            Background="Red"
+            Background="#ff7fa5"
             RowDefinitions="3*,2*"
             VerticalAlignment="Stretch">
 
@@ -74,6 +74,8 @@
                        FontFamily="Comic Sans MS"
                        Content="TREASURE HUNTER">
                 </Label>
+                
+                <!--<Image Source="avares://DoraTheExplorer/Assets/image/dora logo kelompok.png"></Image>-->
             </Grid>
 
             <!-- Group Name -->
@@ -124,7 +126,7 @@
             <!-- Output -->
             <Grid
                 Grid.Column="1"
-                Background="Yellow"
+                Background="#ff3752"
                 RowDefinitions="*,*,*,10*">
 
                 <!-- Execution Time (Statis) -->
@@ -173,13 +175,13 @@
         <!-- Input -->
         <Grid
             Grid.Row="2"
-            Background="Gray"
+            Background="#da5a9f"
             ColumnDefinitions="5*,2*,*"
             RowDefinitions="*">
 
             <!-- Input File -->
             <Grid
-                Background="Orange"
+                Background="#da5a9f"
                 RowDefinitions="2*, 3*">
 
                 <!-- FileName -->
@@ -200,6 +202,8 @@
                         HorizontalAlignment="Center"
                         Classes="inputButton"
                         Content="Browse File"
+                        Background="#ff7fa5"
+                        Foreground="White"
                         x:Name="BrowseFileButton"
                         Click="BrowseFileButton_Click">
                     </Button>
@@ -211,6 +215,8 @@
                         HorizontalAlignment="Center"
                         Classes="inputButton"
                         x:Name="VisualizeButton"
+                        Background="#ff7fa5"
+                        Foreground="White"
                         Click="VisualizeButton_Click"
                         Content="Visualize">
                     </Button>
@@ -222,7 +228,7 @@
                 Grid.Column="1"
                 RowDefinitions="*,*,*"
                 ColumnDefinitions="*"
-                Background="Aquamarine">
+                Background="#da5a9f">
 
                 <!-- BFS/DFS -->
                 <Grid
@@ -268,12 +274,18 @@
             <Button
                 x:Name="SearchButton"
                 Grid.Column="2"
+                Height="80"
+                Width="100"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
                 Foreground="White"
-                Background="Black"
-                Content="Search"
+                Background="#ff7fa5"
+                Content="Explore!"
                 Click="SearchButton_Click">
+                <!--<Image Stretch="None" Source="{Binding Converter=}">
+                </Image>-->
 
                 <!-- Command="{Binding SearchResult}"
 				    Command="{Binding Grid, ElementName=mazeVisulaization}"-->
