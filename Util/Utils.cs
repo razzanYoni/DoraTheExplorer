@@ -12,31 +12,6 @@ namespace DoraTheExplorer.Util;
 
 public class Utils
 {
-    public class ResultJSONItem
-    {
-        public List<Coordinate> visitedLocations;
-        public List<Coordinate> backtrackLocations;
-        public Coordinate CurrentLocation;
-    }
-
-    public static T? Deserialize<T>(string filepath)
-    {
-        string jsonString = File.ReadAllText(filepath);
-        return JsonSerializer.Deserialize<T>(filepath);
-    }
-
-    public static async Task WriteToJSONFileAsync<T>(string filePath, T data)
-    {
-        string jsonString = JsonSerializer.Serialize(data);
-
-        filePath = filePath.Substring(0, filePath.Length - 4);
-
-        System.IO.FileInfo file = new System.IO.FileInfo("./Result/" + filePath + ".json");
-        file.Directory?.Create(); // If the directory already exists, this method does nothing.
-
-        await File.WriteAllTextAsync(file.FullName, jsonString);
-    }
-
     public static (SolutionMatrix?, Graph<Coordinate>?, bool) ReadFile(string path)
     {
         string[] lines = System.IO.File.ReadAllLines(path);
@@ -113,16 +88,16 @@ public class Utils
             switch (delta)
             {
                 case (0, -1):
-                    res.Add('L');
-                    break;
-                case (-1, 0):
                     res.Add('U');
                     break;
+                case (-1, 0):
+                    res.Add('L');
+                    break;
                 case (0, 1):
-                    res.Add('R');
+                    res.Add('D');
                     break;
                 case (1, 0):
-                    res.Add('D');
+                    res.Add('R');
                     break;
                 default:
                     // throw new UnreachableException("Tidak mungkin ada |delta| > 1");

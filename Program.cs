@@ -1,10 +1,13 @@
 ﻿using Avalonia;
+using Avalonia.Skia;
 using System;
+using Avalonia.Skia.Helpers;
 using System.Collections.Generic;
 using DoraTheExplorer.Structure;
 using DoraTheExplorer.Algorithm;
 using System.Reflection;
 using Avalonia.ReactiveUI;
+using Avalonia.Svg.Skia;
 using Microsoft.VisualBasic.CompilerServices;
 using Utils = DoraTheExplorer.Util.Utils;
 
@@ -21,8 +24,13 @@ class Program
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
+    {
+        GC.KeepAlive(typeof(SvgImageExtension).Assembly);
+        GC.KeepAlive(typeof(Avalonia.Svg.Skia.Svg).Assembly);
+        return AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .LogToTrace()
             .UseReactiveUI();
+        
+    }
 }
