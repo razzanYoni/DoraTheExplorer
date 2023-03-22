@@ -4,7 +4,7 @@
         xmlns:vm="using:DoraTheExplorer.ViewModels"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:unicode="clr-namespace:Avalonia.Media.TextFormatting.Unicode;assembly=Avalonia.Visuals"
-        mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="1024"
+        mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="720"
         x:Class="DoraTheExplorer.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="Dora The Explorer"

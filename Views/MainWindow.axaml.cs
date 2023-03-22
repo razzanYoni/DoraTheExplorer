@@ -9,9 +9,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using DoraTheExplorer.Algorithm;
@@ -155,6 +158,8 @@ public partial class MainWindow : Window
 
     private async void Visualize()
     {
+        (_solutionMatrix, _graph, _isNotError) =
+            Utils.ReadFile("/home/msfir/Documents/Tubes/Stima/Tubes2_DoraTheExplorer/Test/tc2.txt");
         /* Visualisasi Maze */
         var row = _solutionMatrix!.Height;
         var col = _solutionMatrix.Width;
@@ -209,6 +214,7 @@ public partial class MainWindow : Window
 
     public void SearchButton_Click(object sender, RoutedEventArgs e)
     {
+        VisualizeButton_Click(sender, e);
         /* Run Time */
         if ((_isNotError) && (_graph is not null) && (_solutionMatrix.TreasureLocations.Length != 0))
         {
