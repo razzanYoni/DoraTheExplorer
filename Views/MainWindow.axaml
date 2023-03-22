@@ -11,12 +11,10 @@
         Width="1100"
         Height="720"
 
-        Icon="\Assets\mandalorianlogo.ico"
+        Icon="\Assets\dora.ico"
         CanResize="False"
         WindowStartupLocation="CenterScreen">
     <!-- ExtendClientAreaToDecorationsHint="True"> -->
-
-    <!-- TODO : Atur Font Size biar relative, Binding Matrix dan Slider, Color Palette-->
 
     <Design.DataContext>
         <vm:MainWindowViewModel />
@@ -196,7 +194,6 @@
                                 <Button
                                     Grid.Row="1"
                                     HorizontalAlignment="Center"
-                                    x:Name="BrowseFileButton"
                                     Click="BrowseFileButton_Click">
                                     Browse File
                                 </Button>
@@ -252,7 +249,6 @@
                     </Border>
                     <Button
                         Grid.Column="2"
-                        x:Name="SearchButton"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"
                         Foreground="White"
@@ -394,15 +390,17 @@
                         Routes
                     </Label>
                 </StackPanel>
-                <TextBlock
-                    FontFamily="/Assets/JetBrainsMono.ttf#JetBrainsMono"
-                    FontSize="20"
-                    Foreground="White"
-                    TextAlignment="Left"
-                    TextWrapping="Wrap"
-                    Margin="20 0"
-                    x:Name="RouteTextBlock">
-                </TextBlock>
+                <ScrollViewer>
+                    <TextBlock
+                        FontFamily="/Assets/JetBrainsMono.ttf#JetBrainsMono"
+                        FontSize="20"
+                        Foreground="White"
+                        TextAlignment="Left"
+                        TextWrapping="Wrap"
+                        Margin="20 0"
+                        x:Name="RouteTextBlock">
+                    </TextBlock>
+                </ScrollViewer>
             </StackPanel>
         </Grid>
 

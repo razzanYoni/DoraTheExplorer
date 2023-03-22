@@ -9,12 +9,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using DoraTheExplorer.Algorithm;
@@ -26,19 +23,17 @@ namespace DoraTheExplorer.Views;
 
 // TODO : Async Task to load image
 // TODO : fix bug big maze
+// TODO : Scroll viewer di routes
 
 public partial class MainWindow : Window
 {
+
+    // Input
+    public string FilePath;
+    public Label fileNameLabel;
     public RadioButton bfsRadioButton;
     public RadioButton dfsRadioButton;
     public CheckBox tspCheckBox;
-
-    public Label fileNameLabel;
-
-    public Button browseFileButton;
-
-    // public Button visualizeButton;
-    public Button searchButton;
 
     private StackPanel mazePanel;
     private StackPanel[] mazeRows;
@@ -50,7 +45,6 @@ public partial class MainWindow : Window
     public Label nodesLabel;
     public TextBlock routeTextBlock;
 
-    public string FilePath;
     private Bitmap _doraBitmap;
     private readonly Image _doraImage;
 
@@ -59,12 +53,12 @@ public partial class MainWindow : Window
     private List<State>? _states;
     private bool _isNotError;
     private SolutionMatrix _solutionMatrix;
-    private bool _isPlayed;
 
+    // Media Player
+    private bool _isPlayed;
     public MainWindow()
     {
         InitializeComponent();
-
 
         this.bfsRadioButton = this.FindControl<RadioButton>("BfsRadioButton");
         this.bfsRadioButton.SetValue(ToggleButton.IsCheckedProperty, true);
@@ -75,12 +69,6 @@ public partial class MainWindow : Window
 
         this.fileNameLabel = this.FindControl<Label>("FileNameLabel");
         this.fileNameLabel.Content = "No File Selected";
-
-        this.browseFileButton = this.FindControl<Button>("BrowseFileButton");
-
-        // this.visualizeButton = this.FindControl<Button>("VisualizeButton");
-
-        this.searchButton = this.FindControl<Button>("SearchButton");
 
         this.mazePanel = this.FindControl<StackPanel>("MazePanel");
 
@@ -134,6 +122,12 @@ public partial class MainWindow : Window
                 _graph.ClearVertices();
             }
 
+            if (_solutionMatrix is not null)
+            {
+                _solutionMatrix.Clear();
+            }
+
+
             (_solutionMatrix, _graph, _isNotError) = Utils.ReadFile(result.Result[0]);
             if (!_isNotError)
             {
@@ -147,6 +141,7 @@ public partial class MainWindow : Window
             else
             {
                 Debug.WriteLine("Udah Bener");
+                this.mazeSlider.Maximum = 0;
                 Visualize();
             }
         }
@@ -158,8 +153,6 @@ public partial class MainWindow : Window
 
     private async void Visualize()
     {
-        (_solutionMatrix, _graph, _isNotError) =
-            Utils.ReadFile("/home/msfir/Documents/Tubes/Stima/Tubes2_DoraTheExplorer/Test/tc2.txt");
         /* Visualisasi Maze */
         var row = _solutionMatrix!.Height;
         var col = _solutionMatrix.Width;
@@ -192,7 +185,7 @@ public partial class MainWindow : Window
 
         // start cell
         var startCoord = _solutionMatrix.States[0].CurrentLocation;
-        cells[startCoord.y, startCoord.x].Child = _doraImage;
+        // cells[startCoord.y, startCoord.x].Child = _doraImage;
         cells[startCoord.y, startCoord.x].Background = Brushes.White;
         cellColors[startCoord.y, startCoord.x] = Brushes.Aquamarine;
 
@@ -214,15 +207,12 @@ public partial class MainWindow : Window
 
     public void SearchButton_Click(object sender, RoutedEventArgs e)
     {
-        VisualizeButton_Click(sender, e);
         /* Run Time */
         if ((_isNotError) && (_graph is not null) && (_solutionMatrix.TreasureLocations.Length != 0))
         {
             _path?.Clear();
             _states?.Clear();
             
-            Visualize();
-            // stopwatch.Start();
             var watch = System.Diagnostics.Stopwatch.StartNew();
             watch.Start();
             if (this.tspCheckBox.IsChecked == true)
@@ -259,10 +249,10 @@ public partial class MainWindow : Window
             }
             watch.Stop();
             TimeSpan elapsedMs = watch.Elapsed;
-            this.executionTimeLabel.Content = "Time : " + elapsedMs.TotalMilliseconds + " ms";
-            this.routeTextBlock.Text = "Route : " + String.Join("-", Utils.ConvertRoute(_path));
-            this.stepsLabel.Content = "Steps : " + (_path.Count - 1);
-            this.nodesLabel.Content = "Nodes : " + _states.Count;
+            this.executionTimeLabel.Content = elapsedMs.TotalMilliseconds + " ms";
+            this.routeTextBlock.Text = String.Join("-", Utils.ConvertRoute(_path));
+            this.stepsLabel.Content = (_path.Count - 1);
+            this.nodesLabel.Content = _states.Count;
 
             this.mazeSlider!.Maximum = _states.Count;
             this.mazeSlider.Value = 0;
