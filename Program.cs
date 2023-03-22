@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using DoraTheExplorer.Structure;
 using DoraTheExplorer.Algorithm;
 using System.Reflection;
+using Avalonia.Dialogs;
 using Avalonia.ReactiveUI;
 using Avalonia.Svg.Skia;
 using Microsoft.VisualBasic.CompilerServices;

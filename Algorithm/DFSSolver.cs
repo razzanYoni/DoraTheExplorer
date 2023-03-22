@@ -130,7 +130,7 @@ public class DFSSolver
                 blocked = false;
             }
 
-            if (v.Left is not null && !state.IsSavedVisited(v.Left.Info) && !state.IsBacktracked(v.Left.Info))
+            if (v.Left is not null && !state.IsVisited(v.Left.Info) && !state.IsBacktracked(v.Left.Info))
             {
                 var curTrack = new List<Coordinate>(t);
                 q.Push(v.Left);
@@ -139,7 +139,7 @@ public class DFSSolver
                 blocked = false;
             }
 
-            if (v.Down is not null && !state.IsSavedVisited(v.Down.Info) && !state.IsBacktracked(v.Down.Info))
+            if (v.Down is not null && !state.IsVisited(v.Down.Info) && !state.IsBacktracked(v.Down.Info))
             {
                 var curTrack = new List<Coordinate>(t);
                 q.Push(v.Down);
@@ -148,7 +148,7 @@ public class DFSSolver
                 blocked = false;
             }
 
-            if (v.Right is not null && !state.IsSavedVisited(v.Right.Info) && !state.IsBacktracked(v.Right.Info))
+            if (v.Right is not null && !state.IsVisited(v.Right.Info) && !state.IsBacktracked(v.Right.Info))
             {
                 var curTrack = new List<Coordinate>(t);
                 q.Push(v.Right);

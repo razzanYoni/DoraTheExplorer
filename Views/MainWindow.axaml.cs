@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -27,7 +28,6 @@ namespace DoraTheExplorer.Views;
 
 public partial class MainWindow : Window
 {
-
     // Input
     public string FilePath;
     public Label fileNameLabel;
@@ -52,10 +52,11 @@ public partial class MainWindow : Window
     private List<Coordinate>? _path;
     private List<CompressedState>? _states;
     private bool _isNotError;
-    private SolutionMatrix _solutionMatrix;
+    private SolutionMatrix? _solutionMatrix;
 
     // Media Player
     private bool _isPlayed;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -98,60 +99,51 @@ public partial class MainWindow : Window
         };
     }
 
-    public void BrowseFileButton_Click(object sender, RoutedEventArgs e)
+    public async void BrowseFileButton_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new OpenFileDialog();
         dialog.Filters?.Add(new FileDialogFilter() { Name = "Text Files", Extensions = { "txt" } });
         dialog.AllowMultiple = false;
-        var result = dialog.ShowAsync(this);
-        if (result.Result != null)
+        var result = await dialog.ShowAsync(this);
+        if (result == null)
         {
-            // path file : result.Result[0]
-            Debug.WriteLine(result.Result[0]);
+            Debug.WriteLine("Masukkan File Dengan Benar");
+            return;
+        }
 
-            // Show File Name in Window
-            this.fileNameLabel.Content =
-                "Filename : " + result.Result[0][(result.Result[0].LastIndexOf('\\') + 1)..];
+        // path file : result.Result[0]
+        Debug.WriteLine(result[0]);
 
-            this.FilePath = result.Result[0];
+        // Show File Name in Window
+        this.fileNameLabel.Content =
+            "Filename : " + Path.GetFileName(result[0]);
 
-            /* Read File */
-            // var readFromFile = new ReadFromFile();
-            if (_graph is not null)
-            {
-                _graph.ClearVertices();
-            }
+        this.FilePath = result[0];
 
-            if (_solutionMatrix is not null)
-            {
-                _solutionMatrix.Clear();
-            }
+        /* Read File */
+        // var readFromFile = new ReadFromFile();
+        _graph?.ClearVertices();
+        _solutionMatrix?.Clear();
 
+        (_solutionMatrix, _graph, _isNotError) = Utils.ReadFile(result[0]);
+        if (!_isNotError)
+        {
+            // file error alert in window
+            Debug.WriteLine("File Error");
+            var alert = new DialogWindow("File Error");
 
-            (_solutionMatrix, _graph, _isNotError) = Utils.ReadFile(result.Result[0]);
-            if (!_isNotError)
-            {
-                // file error alert in window
-                Debug.WriteLine("File Error");
-                var alert = new DialogWindow("File Error");
-
-                alert.ShowDialog(this);
-                this.fileNameLabel.Content = "No File Selected";
-            }
-            else
-            {
-                Debug.WriteLine("Udah Bener");
-                this.mazeSlider.Maximum = 0;
-                Visualize();
-            }
+            await alert.ShowDialog(this);
+            this.fileNameLabel.Content = "No File Selected";
         }
         else
         {
-            Debug.WriteLine("Masukkan File Dengan Benar");
+            Debug.WriteLine("Udah Bener");
+            this.mazeSlider.Maximum = 0;
+            Visualize();
         }
     }
 
-    private async void Visualize()
+    private void Visualize()
     {
         /* Visualisasi Maze */
         var row = _solutionMatrix!.Height;
@@ -205,14 +197,14 @@ public partial class MainWindow : Window
         }
     }
 
-    public void SearchButton_Click(object sender, RoutedEventArgs e)
+    public async void SearchButton_Click(object sender, RoutedEventArgs e)
     {
         /* Run Time */
         if ((_isNotError) && (_graph is not null) && (_solutionMatrix.TreasureLocations.Length != 0))
         {
             _path?.Clear();
             _states?.Clear();
-            
+
             var watch = System.Diagnostics.Stopwatch.StartNew();
             watch.Start();
             if (this.tspCheckBox.IsChecked == true)
@@ -302,19 +294,19 @@ public partial class MainWindow : Window
             var (i, j) = (loc.y, loc.x);
             if (state.CurrentLocation.Equals(loc))
             {
-                cells[i, j].Fill = Brushes.Blue;
+                cells[i, j].Background = Brushes.Blue;
             }
             else if (state.IsBacktracked(loc))
             {
-                cells[i, j].Fill = Brushes.Red;
+                cells[i, j].Background = Brushes.Red;
             }
             else if (state.IsVisited(loc) || state.IsSavedVisited(loc))
             {
-                cells[i, j].Fill = Brushes.Yellow;
+                cells[i, j].Background = Brushes.Yellow;
             }
             else
             {
-                cells[i, j].Fill = cellColors[i, j];
+                cells[i, j].Background = cellColors[i, j];
             }
         }
     }
