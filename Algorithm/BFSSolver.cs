@@ -52,22 +52,22 @@ public class BFSSolver
         }
     }
 
-    public static (List<Coordinate>?, List<State>) FindPath(Graph<Coordinate> graph, State initialState,
-        Coordinate[] goals, bool tsp = false)
+    public static (List<Coordinate>?, List<CompressedState>) FindPath(Graph<Coordinate> graph, CompressedState initialState,
+        IEnumerable<Coordinate> goals, bool tsp = false)
     {
-        Coordinate start = initialState.CurrentLocation;
-        var state = new State(initialState);
+        var start = initialState.CurrentLocation;
+        var state = new CompressedState(initialState);
         var paths = new List<List<Coordinate>>();
-        var statesList = new List<List<State>>();
+        var statesList = new List<List<CompressedState>>();
         var goalSet = new List<Coordinate>(goals);
         while (goalSet.Count > 0)
         {
             var shortestGoal = goalSet[0];
-            var (shortestPath, shortestStates) = FindPath(graph, new State(state), shortestGoal);
+            var (shortestPath, shortestStates) = FindPath(graph, new CompressedState(state), shortestGoal);
             for (int i = 1; i < goalSet.Count; i++)
             {
                 var goal = goalSet[i];
-                var (path, states) = FindPath(graph, new State(state), goal);
+                var (path, states) = FindPath(graph, new CompressedState(state), goal);
                 if (states.Count < shortestStates.Count)
                 {
                     shortestPath = path;
@@ -78,29 +78,31 @@ public class BFSSolver
 
             if (shortestPath is not null) paths.Add(shortestPath);
             statesList.Add(shortestStates);
-            state = new State(shortestStates.Last());
+            state = new CompressedState(shortestStates.Last());
             goalSet.Remove(shortestGoal);
         }
 
         if (tsp)
         {
-            var (path, states) = FindPath(graph, new State(state), start);
+            state.RemoveVisitedLocation(start);
+            var (path, states) = FindPath(graph, new CompressedState(state), start);
             if (path is not null) paths.Add(path);
             statesList.Add(states);
         }
 
         var resPath = new List<Coordinate>(paths.First());
-        var resStates = new List<State>(statesList.First());
+        var resStates = new List<CompressedState>(statesList.First());
         for (var i = 1; i < paths.Count; i++) resPath.AddRange(paths[i].Skip(1));
         for (var i = 1; i < statesList.Count; i++) resStates.AddRange(statesList[i].Skip(1));
         return (resPath, resStates);
     }
 
-    public static (List<Coordinate>?, List<State>) FindPath(Graph<Coordinate> graph, State initialState,
+    public static (List<Coordinate>?, List<CompressedState>) FindPath(Graph<Coordinate> graph,
+        CompressedState initialState,
         Coordinate goal)
     {
-        var states = new List<State>();
-        var state = new State(initialState);
+        var states = new List<CompressedState>();
+        var state = new CompressedState(initialState);
         var q = new Queue<Vertex<Coordinate>>();
         var v = graph.Vertices.Where(e => e.Info.Equals(initialState.CurrentLocation))
             .FirstOrDefault(graph.Vertices[0]);
@@ -112,7 +114,6 @@ public class BFSSolver
         track.Enqueue(new List<Coordinate>(t));
         // backtrack
         var backtrack = false;
-        var savedVisitedLocs = new List<Coordinate>();
         while (q.Count > 0)
         {
             v = q.Dequeue();
@@ -120,14 +121,18 @@ public class BFSSolver
             state.CurrentLocation = v.Info;
             if (v.Info.Equals(goal))
             {
-                states.Add(new State(state));
+                states.Add(new CompressedState(state));
                 path = t;
                 break;
             }
 
-            bool blocked = true;
-            if (v.Right is not null && !state.VisitedLocations.Contains(v.Right.Info) &&
-                !state.BacktrackLocations.Contains(v.Right.Info))
+            if (state.IsVisited(v.Info))
+            {
+                continue;
+            }
+
+            var blocked = true;
+            if (v.Right is not null && !state.IsVisited(v.Right.Info) && !state.IsBacktracked(v.Right.Info))
             {
                 var curTrack = new List<Coordinate>(t);
                 q.Enqueue(v.Right);
@@ -136,8 +141,7 @@ public class BFSSolver
                 blocked = false;
             }
 
-            if (v.Down is not null && !state.VisitedLocations.Contains(v.Down.Info) &&
-                !state.BacktrackLocations.Contains(v.Down.Info))
+            if (v.Down is not null && !state.IsVisited(v.Down.Info) && !state.IsBacktracked(v.Down.Info))
             {
                 var curTrack = new List<Coordinate>(t);
                 q.Enqueue(v.Down);
@@ -146,8 +150,7 @@ public class BFSSolver
                 blocked = false;
             }
 
-            if (v.Left is not null && !state.VisitedLocations.Contains(v.Left.Info) &&
-                !state.BacktrackLocations.Contains(v.Left.Info))
+            if (v.Left is not null && !state.IsVisited(v.Left.Info) && !state.IsBacktracked(v.Left.Info))
             {
                 var curTrack = new List<Coordinate>(t);
                 q.Enqueue(v.Left);
@@ -156,8 +159,7 @@ public class BFSSolver
                 blocked = false;
             }
 
-            if (v.Up is not null && !state.VisitedLocations.Contains(v.Up.Info) &&
-                !state.BacktrackLocations.Contains(v.Up.Info))
+            if (v.Up is not null && !state.IsVisited(v.Up.Info) && !state.IsBacktracked(v.Up.Info))
             {
                 var curTrack = new List<Coordinate>(t);
                 q.Enqueue(v.Up);
@@ -168,7 +170,6 @@ public class BFSSolver
 
             if (blocked && q.Count == 0)
             {
-                savedVisitedLocs.Add(state.VisitedLocations.Last());
                 state.RemoveLatestVisitedLocation();
                 q.Enqueue(v);
                 track.Enqueue(t);
@@ -176,14 +177,13 @@ public class BFSSolver
             }
             else if (backtrack)
             {
-                foreach (var c in savedVisitedLocs) state.SavedVisitedLocations.Add(c);
-                states.Add(new State(state));
+                states.Add(new CompressedState(state));
                 state.AddBacktrackLocation(v.Info);
                 backtrack = false;
             }
             else
             {
-                states.Add(new State(state));
+                states.Add(new CompressedState(state));
                 state.AddVisitedLocation(v.Info);
             }
         }

@@ -44,55 +44,54 @@ public class DFSSolver
         }
     }
 
-    public static (List<Coordinate>?, List<State>) FindPath(Graph<Coordinate> graph, State initialState,
-        Coordinate[] goals, bool tsp = false)
+    public static (List<Coordinate> resPath, List<CompressedState> resStates) FindPath(Graph<Coordinate> graph, CompressedState initialState,
+        IEnumerable<Coordinate> goals, bool tsp = false)
     {
-        Coordinate start = initialState.CurrentLocation;
-        var state = new State(initialState);
+        var start = initialState.CurrentLocation;
+        var state = new CompressedState(initialState);
         var paths = new List<List<Coordinate>>();
-        var statesList = new List<List<State>>();
+        var statesList = new List<List<CompressedState>>();
         var goalSet = new List<Coordinate>(goals);
         while (goalSet.Count > 0)
         {
             var shortestGoal = goalSet[0];
-            var (shortestPath, shortestStates) = FindPath(graph, new State(state), shortestGoal);
-            for (int i = 1; i < goalSet.Count; i++)
+            var (shortestPath, shortestStates) = FindPath(graph, new CompressedState(state), shortestGoal);
+            for (var i = 1; i < goalSet.Count; i++)
             {
                 var goal = goalSet[i];
-                var (path, states) = FindPath(graph, new State(state), goal);
-                if (states.Count < shortestStates.Count)
-                {
-                    shortestPath = path;
-                    shortestStates = states;
-                    shortestGoal = goal;
-                }
+                var (path, states) = FindPath(graph, new CompressedState(state), goal);
+                if (states.Count >= shortestStates.Count) continue;
+                shortestPath = path;
+                shortestStates = states;
+                shortestGoal = goal;
             }
 
             if (shortestPath is not null) paths.Add(shortestPath);
             statesList.Add(shortestStates);
-            state = new State(shortestStates.Last());
+            state = new CompressedState(shortestStates.Last());
             goalSet.Remove(shortestGoal);
         }
 
         if (tsp)
         {
-            var (path, states) = FindPath(graph, new State(state), start);
+            state.RemoveVisitedLocation(start);
+            var (path, states) = FindPath(graph, new CompressedState(state), start);
             if (path is not null) paths.Add(path);
             statesList.Add(states);
         }
 
         var resPath = new List<Coordinate>(paths.First());
-        var resStates = new List<State>(statesList.First());
+        var resStates = new List<CompressedState>(statesList.First());
         for (int i = 1; i < paths.Count; i++) resPath.AddRange(paths[i].Skip(1));
         for (int i = 1; i < statesList.Count; i++) resStates.AddRange(statesList[i].Skip(1));
         return (resPath, resStates);
     }
 
-    public static (List<Coordinate>?, List<State>) FindPath(Graph<Coordinate> graph, State initialState,
+    public static (List<Coordinate>?, List<CompressedState>) FindPath(Graph<Coordinate> graph, CompressedState initialState,
         Coordinate goal)
     {
-        var states = new List<State>();
-        var state = initialState;
+        var states = new List<CompressedState>();
+        var state = new CompressedState(initialState);
         var q = new Stack<Vertex<Coordinate>>();
         var v = graph.Vertices.Where(e => e.Info.Equals(initialState.CurrentLocation))
             .FirstOrDefault(graph.Vertices[0]);
@@ -104,7 +103,6 @@ public class DFSSolver
         track.Push(new List<Coordinate>(t));
         // backtrack
         var backtrack = false;
-        var savedVisitedLocs = new List<Coordinate>();
         while (q.Count > 0)
         {
             v = q.Pop();
@@ -112,14 +110,18 @@ public class DFSSolver
             state.CurrentLocation = v.Info;
             if (v.Info.Equals(goal))
             {
-                states.Add(new State(state));
+                states.Add(new CompressedState(state));
                 path = t;
                 break;
             }
+            
+            if (state.IsVisited(v.Info))
+            {
+                continue;
+            }
 
-            bool blocked = true;
-            if (v.Up is not null && !state.VisitedLocations.Contains(v.Up.Info) &&
-                !state.BacktrackLocations.Contains(v.Up.Info))
+            var blocked = true;
+            if (v.Up is not null && !state.IsVisited(v.Up.Info) && !state.IsBacktracked(v.Up.Info))
             {
                 var curTrack = new List<Coordinate>(t);
                 q.Push(v.Up);
@@ -128,8 +130,7 @@ public class DFSSolver
                 blocked = false;
             }
 
-            if (v.Left is not null && !state.VisitedLocations.Contains(v.Left.Info) &&
-                !state.BacktrackLocations.Contains(v.Left.Info))
+            if (v.Left is not null && !state.IsSavedVisited(v.Left.Info) && !state.IsBacktracked(v.Left.Info))
             {
                 var curTrack = new List<Coordinate>(t);
                 q.Push(v.Left);
@@ -138,8 +139,7 @@ public class DFSSolver
                 blocked = false;
             }
 
-            if (v.Down is not null && !state.VisitedLocations.Contains(v.Down.Info) &&
-                !state.BacktrackLocations.Contains(v.Down.Info))
+            if (v.Down is not null && !state.IsSavedVisited(v.Down.Info) && !state.IsBacktracked(v.Down.Info))
             {
                 var curTrack = new List<Coordinate>(t);
                 q.Push(v.Down);
@@ -148,8 +148,7 @@ public class DFSSolver
                 blocked = false;
             }
 
-            if (v.Right is not null && !state.VisitedLocations.Contains(v.Right.Info) &&
-                !state.BacktrackLocations.Contains(v.Right.Info))
+            if (v.Right is not null && !state.IsSavedVisited(v.Right.Info) && !state.IsBacktracked(v.Right.Info))
             {
                 var curTrack = new List<Coordinate>(t);
                 q.Push(v.Right);
@@ -160,7 +159,6 @@ public class DFSSolver
 
             if (blocked && q.Count == 0)
             {
-                savedVisitedLocs.Add(state.VisitedLocations.Last());
                 state.RemoveLatestVisitedLocation();
                 q.Push(v);
                 track.Push(t);
@@ -168,14 +166,13 @@ public class DFSSolver
             }
             else if (backtrack)
             {
-                foreach (var c in savedVisitedLocs) state.SavedVisitedLocations.Add(c);
-                states.Add(new State(state));
+                states.Add(new CompressedState(state));
                 state.AddBacktrackLocation(v.Info);
                 backtrack = false;
             }
             else
             {
-                states.Add(new State(state));
+                states.Add(new CompressedState(state));
                 state.AddVisitedLocation(v.Info);
             }
         }

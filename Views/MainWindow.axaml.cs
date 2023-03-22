@@ -50,7 +50,7 @@ public partial class MainWindow : Window
 
     private Graph<Coordinate>? _graph;
     private List<Coordinate>? _path;
-    private List<State>? _states;
+    private List<CompressedState>? _states;
     private bool _isNotError;
     private SolutionMatrix _solutionMatrix;
 
@@ -62,7 +62,7 @@ public partial class MainWindow : Window
 
         this.bfsRadioButton = this.FindControl<RadioButton>("BfsRadioButton");
         this.bfsRadioButton.SetValue(ToggleButton.IsCheckedProperty, true);
-        
+
         this.dfsRadioButton = this.FindControl<RadioButton>("DfsRadioButton");
 
         this.tspCheckBox = this.FindControl<CheckBox>("TspCheckBox");
@@ -111,7 +111,7 @@ public partial class MainWindow : Window
 
             // Show File Name in Window
             this.fileNameLabel.Content =
-                "Filename : " + result.Result[0].Substring(result.Result[0].LastIndexOf('\\') + 1);
+                "Filename : " + result.Result[0][(result.Result[0].LastIndexOf('\\') + 1)..];
 
             this.FilePath = result.Result[0];
 
@@ -220,15 +220,15 @@ public partial class MainWindow : Window
                 if (this.bfsRadioButton.IsChecked == true)
                 {
                     Debug.WriteLine("Eksekusi bfs dengan tsp \n");
-                    (_path, _states) = BFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
-                        _solutionMatrix.TreasureLocations, true);
+                    (_path, _states) = await Task.Run(() => BFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
+                        _solutionMatrix.TreasureLocations, true));
                 }
                 else
                 {
                     Debug.WriteLine("Eksekusi dfs dengan tsp \n");
 
-                    (_path, _states) = DFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
-                        _solutionMatrix.TreasureLocations, true);
+                    (_path, _states) = await Task.Run(() => DFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
+                        _solutionMatrix.TreasureLocations, true));
                 }
             }
             else
@@ -236,17 +236,18 @@ public partial class MainWindow : Window
                 if (this.bfsRadioButton.IsChecked == true)
                 {
                     Debug.WriteLine("Eksekusi bfs tanpa tsp \n");
-                    (_path, _states) = BFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
-                        _solutionMatrix.TreasureLocations);
+                    (_path, _states) = await Task.Run(() => BFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
+                        _solutionMatrix.TreasureLocations));
                 }
                 else
                 {
                     Debug.WriteLine("Eksekusi dfs tanpa tsp \n");
 
-                    (_path, _states) = DFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
-                        _solutionMatrix.TreasureLocations);
+                    (_path, _states) = await Task.Run(() => DFSSolver.FindPath(_graph, _solutionMatrix.States.First(),
+                        _solutionMatrix.TreasureLocations));
                 }
             }
+
             watch.Stop();
             TimeSpan elapsedMs = watch.Elapsed;
             this.executionTimeLabel.Content = elapsedMs.TotalMilliseconds + " ms";
@@ -265,7 +266,7 @@ public partial class MainWindow : Window
             // show dialog alert
             var alert = new DialogWindow("Belum ada file");
 
-            alert.ShowDialog(this);
+            await alert.ShowDialog(this);
         }
     }
 
@@ -295,28 +296,25 @@ public partial class MainWindow : Window
         }
 
         var state = _solutionMatrix.States[idx];
-        for (var i = 0; i < row; i++)
+        foreach (var c in _solutionMatrix.Cells)
         {
-            for (var j = 0; j < col; j++)
+            var loc = c.Coord;
+            var (i, j) = (loc.y, loc.x);
+            if (state.CurrentLocation.Equals(loc))
             {
-                var loc = new Coordinate(j, i);
-                if (state.CurrentLocation.Equals(loc))
-                {
-                    cells[i, j].Background = Brushes.Blue;
-                }
-                else if (state.BacktrackLocations.ToList().Any(coordinate => coordinate.Equals(loc)))
-                {
-                    cells[i, j].Background = Brushes.Red;
-                }
-                else if (state.VisitedLocations.ToList().Concat(state.SavedVisitedLocations)
-                         .Any(coordinate => coordinate.Equals(loc)))
-                {
-                    cells[i, j].Background = Brushes.Yellow;
-                }
-                else
-                {
-                    cells[i, j].Background = cellColors[i, j];
-                }
+                cells[i, j].Fill = Brushes.Blue;
+            }
+            else if (state.IsBacktracked(loc))
+            {
+                cells[i, j].Fill = Brushes.Red;
+            }
+            else if (state.IsVisited(loc) || state.IsSavedVisited(loc))
+            {
+                cells[i, j].Fill = Brushes.Yellow;
+            }
+            else
+            {
+                cells[i, j].Fill = cellColors[i, j];
             }
         }
     }
@@ -325,20 +323,21 @@ public partial class MainWindow : Window
     {
         if (this._states is null || this._states.Count == 0 || this.mazeSlider.Value == this.mazeSlider.Maximum) return;
         _isPlayed = true;
-        
+
         while (_isPlayed && this.mazeSlider.Value < this.mazeSlider.Maximum)
         {
             this.mazeSlider.Value += 1;
             await WorkAsync();
         }
+
         _isPlayed = false;
     }
-    
+
     public void PauseButton_Click(object sender, RoutedEventArgs e)
     {
         _isPlayed = false;
     }
-    
+
     private void ResetButton_Click(object sender, RoutedEventArgs e)
     {
         _isPlayed = false;
@@ -348,9 +347,6 @@ public partial class MainWindow : Window
     private Task WorkAsync()
     {
         if (!_isPlayed) return Task.CompletedTask;
-        return Task.Run(() =>
-        {
-            Thread.Sleep(200);
-        });
+        return Task.Run(() => { Thread.Sleep(200); });
     }
 }

@@ -51,7 +51,8 @@ public class Utils
 
                     if (lines[i][j] == 'K')
                     {
-                        solutionMatrix.AddState(new State(new Coordinate(j, i)));
+                        solutionMatrix.AddState(new CompressedState(new Coordinate(j, i), solutionMatrix.Width,
+                            solutionMatrix.Height));
                     }
 
                     if (lines[i][j] == 'T')
