@@ -2,15 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Shapes;
+using Avalonia.Input;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using DoraTheExplorer.Algorithm;
 using DoraTheExplorer.Structure;
 using DoraTheExplorer.Util;
@@ -18,25 +24,25 @@ using Tubes2_DoraTheExplorer.Views;
 
 namespace DoraTheExplorer.Views;
 
-// TODO : Execution Time, Steps, Route
-// TODO : Slider SHow solution path 
-// TODO : Counter untuk alpha
+// TODO : Async Task to load image
+// TODO : fix bug big maze
 
 public partial class MainWindow : Window
 {
-
     public RadioButton bfsRadioButton;
     public RadioButton dfsRadioButton;
     public CheckBox tspCheckBox;
 
     public Label fileNameLabel;
+
     public Button browseFileButton;
-    public Button visualizeButton;
+
+    // public Button visualizeButton;
     public Button searchButton;
 
     private StackPanel mazePanel;
     private StackPanel[] mazeRows;
-    private Rectangle[,] cells;
+    private Border[,] cells;
     private ISolidColorBrush[,] cellColors;
     public Slider? mazeSlider;
     public Label executionTimeLabel;
@@ -45,6 +51,8 @@ public partial class MainWindow : Window
     public TextBlock routeTextBlock;
 
     public string FilePath;
+    private Bitmap _doraBitmap;
+    private readonly Image _doraImage;
 
     private Graph<Coordinate>? _graph;
     private List<Coordinate>? _path;
@@ -70,7 +78,7 @@ public partial class MainWindow : Window
 
         this.browseFileButton = this.FindControl<Button>("BrowseFileButton");
 
-        this.visualizeButton = this.FindControl<Button>("VisualizeButton");
+        // this.visualizeButton = this.FindControl<Button>("VisualizeButton");
 
         this.searchButton = this.FindControl<Button>("SearchButton");
 
@@ -82,20 +90,24 @@ public partial class MainWindow : Window
         this.mazeSlider.TickFrequency = 1;
 
         this.executionTimeLabel = this.FindControl<Label>("ExecutionTimeLabel");
-        this.executionTimeLabel.Content = "Execution Time : 00 ms";
+        this.executionTimeLabel.Content = "-";
 
         this.stepsLabel = this.FindControl<Label>("StepsLabel");
-        this.stepsLabel.Content = "Steps : 0";
+        this.stepsLabel.Content = "-";
 
         this.nodesLabel = this.FindControl<Label>("NodesLabel");
-        this.nodesLabel.Content = "Nodes : ";
+        this.nodesLabel.Content = "-";
 
         this.routeTextBlock = this.FindControl<TextBlock>("RouteTextBlock");
-        this.routeTextBlock.SetValue(
-            TextBlock.TextProperty,
-            "Route : ");
 
         this._isNotError = false;
+        var assemblyName = Assembly.GetEntryAssembly()?.GetName().Name;
+        this._doraBitmap = new Bitmap(AvaloniaLocator.Current.GetService<IAssetLoader>()
+            ?.Open(new Uri($"avares://{assemblyName}/Assets/image/dora.png")));
+        this._doraImage = new Image
+        {
+            Source = _doraBitmap
+        };
     }
 
     public void BrowseFileButton_Click(object sender, RoutedEventArgs e)
@@ -135,6 +147,7 @@ public partial class MainWindow : Window
             else
             {
                 Debug.WriteLine("Udah Bener");
+                Visualize();
             }
         }
         else
@@ -143,14 +156,17 @@ public partial class MainWindow : Window
         }
     }
 
-    private void Visualize()
+    private async void Visualize()
     {
+        (_solutionMatrix, _graph, _isNotError) =
+            Utils.ReadFile("/home/msfir/Documents/Tubes/Stima/Tubes2_DoraTheExplorer/Test/tc2.txt");
+        /* Visualisasi Maze */
         var row = _solutionMatrix!.Height;
         var col = _solutionMatrix.Width;
         mazeRows = new StackPanel[row];
-        cells = new Rectangle[row, col];
+        cells = new Border[row, col];
         cellColors = new ISolidColorBrush[row, col];
-        var size = Math.Min(500 / row, 800 / col);
+        var size = Math.Min(600 / row, 800 / col);
 
         mazePanel.Children.Clear();
         for (var i = 0; i < row; i++)
@@ -161,12 +177,12 @@ public partial class MainWindow : Window
             };
             for (var j = 0; j < col; j++)
             {
-                cells[i, j] = new Rectangle
+                cells[i, j] = new Border
                 {
                     Width = size,
                     Height = size,
-                    Stroke = Brushes.Black,
-                    StrokeThickness = 1
+                    BorderBrush = Brushes.Black,
+                    BorderThickness = new Thickness(1)
                 };
                 mazeRows[i].Children.Add(cells[i, j]);
             }
@@ -176,7 +192,8 @@ public partial class MainWindow : Window
 
         // start cell
         var startCoord = _solutionMatrix.States[0].CurrentLocation;
-        cells[startCoord.y, startCoord.x].Fill = Brushes.Aquamarine;
+        cells[startCoord.y, startCoord.x].Child = _doraImage;
+        cells[startCoord.y, startCoord.x].Background = Brushes.White;
         cellColors[startCoord.y, startCoord.x] = Brushes.Aquamarine;
 
         foreach (var c in _solutionMatrix.Cells)
@@ -185,31 +202,19 @@ public partial class MainWindow : Window
             if (_solutionMatrix.TreasureLocations.ToList().Any(coordinate => coordinate.Equals(coord)))
             {
                 cellColors[coord.y, coord.x] = Brushes.Gold;
-                cells[coord.y, coord.x].Fill = cellColors[coord.y, coord.x];
+                cells[coord.y, coord.x].Background = cellColors[coord.y, coord.x];
             }
             else if (!c.Coord.Equals(startCoord))
             {
                 cellColors[coord.y, coord.x] = c.Visitable ? Brushes.Azure : Brushes.Black;
-                cells[coord.y, coord.x].Fill = cellColors[coord.y, coord.x];
+                cells[coord.y, coord.x].Background = cellColors[coord.y, coord.x];
             }
         }
     }
 
-    public void VisualizeButton_Click(object sender, RoutedEventArgs e)
-    {
-        /* Visualisasi Maze */
-        if (!_isNotError)
-        {
-            var alert = new DialogWindow("File Belum Ada");
-            alert.ShowDialog(this);
-            return;
-        }
-        
-        Visualize(); 
-    }
-
     public void SearchButton_Click(object sender, RoutedEventArgs e)
     {
+        VisualizeButton_Click(sender, e);
         /* Run Time */
         if ((_isNotError) && (_graph is not null) && (_solutionMatrix.TreasureLocations.Length != 0))
         {
@@ -260,7 +265,7 @@ public partial class MainWindow : Window
             this.nodesLabel.Content = "Nodes : " + _states.Count;
 
             this.mazeSlider!.Maximum = _states.Count;
-            this.mazeSlider.Value = _states.Count;
+            this.mazeSlider.Value = 0;
             this._solutionMatrix.SetStates(_states);
         }
         else
@@ -289,7 +294,7 @@ public partial class MainWindow : Window
                 for (var j = 0; j < col; j++)
                 {
                     var loc = new Coordinate(j, i);
-                    cells[i, j].Fill = _path!.Any(coordinate => coordinate.Equals(loc))
+                    cells[i, j].Background = _path!.Any(coordinate => coordinate.Equals(loc))
                         ? Utils.Darken(Brushes.LightGreen,
                             Math.Min(0.2 * (_path!.Count(coordinate => coordinate.Equals(loc)) - 1), 0.95))
                         : cellColors[i, j];
@@ -307,20 +312,20 @@ public partial class MainWindow : Window
                 var loc = new Coordinate(j, i);
                 if (state.CurrentLocation.Equals(loc))
                 {
-                    cells[i, j].Fill = Brushes.Blue;
+                    cells[i, j].Background = Brushes.Blue;
                 }
                 else if (state.BacktrackLocations.ToList().Any(coordinate => coordinate.Equals(loc)))
                 {
-                    cells[i, j].Fill = Brushes.Red;
+                    cells[i, j].Background = Brushes.Red;
                 }
                 else if (state.VisitedLocations.ToList().Concat(state.SavedVisitedLocations)
                          .Any(coordinate => coordinate.Equals(loc)))
                 {
-                    cells[i, j].Fill = Brushes.Yellow;
+                    cells[i, j].Background = Brushes.Yellow;
                 }
                 else
                 {
-                    cells[i, j].Fill = cellColors[i, j];
+                    cells[i, j].Background = cellColors[i, j];
                 }
             }
         }
@@ -358,5 +363,4 @@ public partial class MainWindow : Window
             Thread.Sleep(200);
         });
     }
-    
 }
