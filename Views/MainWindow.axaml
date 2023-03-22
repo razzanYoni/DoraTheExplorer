@@ -3,12 +3,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:vm="using:DoraTheExplorer.ViewModels"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:maze="clr-namespace:DoraTheExplorer.Models;assembly=Tubes3_DoraTheExplorer"
-        mc:Ignorable="d" d:DesignWidth="1440" d:DesignHeight="1024"
+        xmlns:unicode="clr-namespace:Avalonia.Media.TextFormatting.Unicode;assembly=Avalonia.Visuals"
+        mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="720"
         x:Class="DoraTheExplorer.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="Dora The Explorer"
-        Width="1024"
+        Width="1100"
         Height="720"
 
         CanResize="False"
@@ -31,84 +31,98 @@
     </Window.Resources>
 
     <Window.Styles>
-        <!-- Input File Button (Hover) -->
-        <Style Selector="Button.inputButton:pointerover /template/ ContentPresenter">
+        <Style Selector="Button">
+            <Setter
+                Property="FontFamily"
+                Value="/Assets/OpenSans-ExtraBold.ttf#Sans">
+            </Setter>
             <Setter
                 Property="Background"
-                Value="#ae487f">
+                Value="#FFFFFF">
             </Setter>
+            <Setter
+                Property="Foreground"
+                Value="#F55CAC">
+            </Setter>
+            <Setter
+                Property="CornerRadius"
+                Value="15">
+            </Setter>
+        </Style>
+        <!-- Input File Button (Hover) -->
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
             <Setter
                 Property="RenderTransform"
                 Value="scale(1.05)">
             </Setter>
             <Setter
-                Property="CornerRadius"
-                Value="5">
+                Property="BoxShadow"
+                Value="inset 0 0 50 50 #16000000">
+            </Setter>
+            <Setter
+                Property="Background"
+                Value="{Binding $parent[Button].Background}">
             </Setter>
             <Setter
                 Property="TextBox.Foreground"
+                Value="{Binding $parent[Button].Foreground}">
+            </Setter>
+        </Style>
+        <Style Selector="Label">
+            <Setter
+                Property="FontFamily"
+                Value="/Assets/OpenSans-ExtraBold.ttf#Sans">
+            </Setter>
+            <Setter
+                Property="Foreground"
                 Value="White">
+            </Setter>
+        </Style>
+        <Style Selector="Label.section">
+            <Setter
+                Property="FontSize"
+                Value="20">
+            </Setter>
+            <Setter
+                Property="Foreground"
+                Value="White">
+            </Setter>
+            <Setter
+                Property="VerticalAlignment"
+                Value="Center">
+            </Setter>
+            <Setter
+                Property="HorizontalAlignment"
+                Value="Center">
             </Setter>
         </Style>
     </Window.Styles>
 
     <!-- Parent -->
-    <Grid
-        RowDefinitions="72,540,108">
-
-        <!-- Title Bar -->
-        <Grid
-            Grid.Row="0"
-            Background="#ff7fa5"
-            RowDefinitions="3*,2*"
-            VerticalAlignment="Stretch">
-
-            <!-- Title -->
-            <Grid
-                Grid.Row="0"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center">
-
-                <Label HorizontalContentAlignment="Center"
-                       FontWeight="Bold"
-                       FontFamily="Comic Sans MS"
-                       Content="TREASURE HUNTER">
-                </Label>
-                
-                <!--<Image Source="avares://DoraTheExplorer/Assets/image/dora logo kelompok.png"></Image>-->
-            </Grid>
-
-            <!-- Group Name -->
-            <Grid
-                Grid.Row="1"
-                VerticalAlignment="Top"
-                HorizontalAlignment="Center">
-
-                <Label
-                    FontFamily="Comic Sans MS"
-                    HorizontalContentAlignment="Center"
-                    VerticalContentAlignment="Top"
-                    Content="BY DORA THE EXPLORER">
-                </Label>
-            </Grid>
-        </Grid>
+    <Grid>
 
         <!-- Result -->
         <Grid
-            Grid.Row="1"
             Background="Black"
             ColumnDefinitions="800,*">
 
             <!-- Maze Visualization -->
-            <Grid ShowGridLines="True"
-                  Grid.Column="0"
-                  RowDefinitions="500,*">
+            <Grid
+                Grid.Column="0"
+                RowDefinitions="600,40,*">
 
                 <StackPanel
+                    Grid.Row="0"
                     HorizontalAlignment="Center"
                     Background="Black"
                     Orientation="Vertical"
-                    x:Name="MazePanel" />
+                    x:Name="MazePanel">
+
+                    <Image
+                        Source="/Assets/image/dora-logo-kelompok.png"
+                        HorizontalAlignment="Center" />
+
+                </StackPanel>
 
                 <!-- Slider -->
                 <Grid
@@ -121,175 +135,248 @@
                         PropertyChanged="MazeSlider_OnPropertyChanged">
                     </Slider>
                 </Grid>
+
+                <!-- Input -->
+                <Grid
+                    Grid.Row="2"
+                    Background="White"
+                    ColumnDefinitions="3*,3*,1*">
+
+                    <!-- File -->
+                    <Border
+                        Grid.Column="0"
+                        Background="#F55CAC"
+                        Margin="0 0 5 0"
+                        CornerRadius="20">
+                        <Grid
+                            ColumnDefinitions="1*,3*">
+                            <Label
+                                Classes="section">
+                                File
+                            </Label>
+                            <Grid
+                                Grid.Column="1"
+                                RowDefinitions="1*,1.5*">
+                                <Label
+                                    Grid.Row="0"
+                                    FontFamily="/Assets/OpenSans-Regular.ttf#Sans"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Bottom"
+                                    Foreground="White"
+                                    x:Name="FileNameLabel">
+                                </Label>
+                                <Button
+                                    Grid.Row="1"
+                                    HorizontalAlignment="Center"
+                                    x:Name="BrowseFileButton"
+                                    Click="BrowseFileButton_Click">
+                                    Browse File
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <!-- Algorithm -->
+                    <Border
+                        Grid.Column="1"
+                        Margin="5 0 5 0"
+                        Background="#F55CAC"
+                        CornerRadius="20">
+                        <Grid
+                            ColumnDefinitions="1*,1*">
+                            <Label
+                                Classes="section">
+                                Algorithm
+                            </Label>
+                            <StackPanel
+                                Grid.Column="1"
+                                HorizontalAlignment="Center"
+                                Orientation="Horizontal">
+                                <StackPanel
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    Orientation="Vertical">
+                                    <RadioButton
+                                        GroupName="Algorithm"
+                                        FontFamily="/Assets/OpenSans-Regular.ttf#Sans"
+                                        Foreground="White"
+                                        x:Name="BfsRadioButton">
+                                        BFS
+                                    </RadioButton>
+                                    <RadioButton
+                                        GroupName="Algorithm"
+                                        FontFamily="/Assets/OpenSans-Regular.ttf#Sans"
+                                        Foreground="White"
+                                        x:Name="DfsRadioButton">
+                                        DFS
+                                    </RadioButton>
+                                </StackPanel>
+                                <CheckBox
+                                    x:Name="TspCheckBox"
+                                    FontFamily="/Assets/OpenSans-Regular.ttf#Sans"
+                                    Foreground="White"
+                                    Margin="20 0 0 0"
+                                    HorizontalAlignment="Right">
+                                    TSP
+                                </CheckBox>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <Button
+                        Grid.Column="2"
+                        x:Name="SearchButton"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Foreground="White"
+                        Background="#F55CAC"
+                        CornerRadius="1000"
+                        Width="70"
+                        Height="70"
+                        Click="SearchButton_Click">
+                        <PathIcon
+                            Data="{StaticResource search_regular}"
+                            Foreground="White">
+                        </PathIcon>
+                    </Button>
+                </Grid>
             </Grid>
 
             <!-- Output -->
-            <Grid
+            <StackPanel
                 Grid.Column="1"
-                Background="#ff3752"
-                RowDefinitions="*,*,*,10*">
-
-                <!-- Execution Time (Statis) -->
-                <Label
-                    Grid.Row="0"
-                    FontFamily="Comic Sans MS"
-                    HorizontalAlignment="Left"
-                    Margin="5"
-                    x:Name="ExecutionTimeLabel">
-                </Label>
-
-                <!-- Steps (Statis) -->
-                <Label
-                    Grid.Row="1"
-                    FontFamily="Comic Sans MS"
-                    HorizontalAlignment="Left"
-                    Margin="5"
-                    x:Name="StepsLabel">
-                </Label>
-
-                <!-- Nodes (Statis) -->
-                <Label
-                    Grid.Row="2"
-                    FontFamily="Comic Sans MS"
-                    HorizontalAlignment="Left"
-                    Margin="5"
-                    x:Name="NodesLabel">
-                </Label>
-
-                <!-- Route (FlexBox) -->
-                <ScrollViewer
-					Grid.Row="3">
-				<TextBlock
-					FontFamily="Comic Sans MS" 
-					HorizontalAlignment="Left" 
-					Margin="5"
-					TextWrapping="Wrap"
-					MinWidth="210"
-					x:Name="RouteTextBlock"
-					>
-				</TextBlock>
-				</ScrollViewer>
-            </Grid>
-        </Grid>
-
-        <!-- Input -->
-        <Grid
-            Grid.Row="2"
-            Background="#da5a9f"
-            ColumnDefinitions="5*,2*,*"
-            RowDefinitions="*">
-
-            <!-- Input File -->
-            <Grid
-                Background="#da5a9f"
-                RowDefinitions="2*, 3*">
-
-                <!-- FileName -->
-                <Label
-                    Grid.Row="0"
-                    Margin="15,5,0,0"
-                    x:Name="FileNameLabel">
-                </Label>
-
-                <Grid
-                    Grid.Row="1"
-                    ColumnDefinitions="*,*">
-
-                    <!-- Input File Button -->
-                    <Button
-                        Grid.Column="0"
-                        Margin="15,5,0,0"
+                Background="#913697"
+                Orientation="Vertical">
+                <Image
+                    Source="/Assets/image/title.png"
+                    HorizontalAlignment="Center"
+                    Height="100">
+                </Image>
+                <StackPanel
+                    Orientation="Vertical"
+                    Margin="0 20">
+                    <Image
+                        Source="/Assets/image/analytics.png"
                         HorizontalAlignment="Center"
-                        Classes="inputButton"
-                        Content="Browse File"
-                        Background="#ff7fa5"
-                        Foreground="White"
-                        x:Name="BrowseFileButton"
-                        Click="BrowseFileButton_Click">
-                    </Button>
-
-                    <!-- Visualize Button -->
-                    <Button
-                        Grid.Column="1"
-                        Margin="15,5,0,0"
-                        HorizontalAlignment="Center"
-                        Classes="inputButton"
-                        x:Name="VisualizeButton"
-                        Background="#ff7fa5"
-                        Foreground="White"
-                        Click="VisualizeButton_Click"
-                        Content="Visualize">
-                    </Button>
-                </Grid>
-            </Grid>
-
-            <!-- Algorithm Input -->
-            <Grid
-                Grid.Column="1"
-                RowDefinitions="*,*,*"
-                ColumnDefinitions="*"
-                Background="#da5a9f">
-
-                <!-- BFS/DFS -->
-                <Grid
-                    Grid.Row="0"
-                    HorizontalAlignment="Left">
-
+                        Width="50"
+                        Height="50">
+                    </Image>
                     <Label
-                        Content="Algorithm : ">
+                        FontSize="20"
+                        HorizontalAlignment="Center">
+                        Analytics
+                    </Label>
+                </StackPanel>
+                <Grid
+                    ColumnDefinitions="1*,1*"
+                    Margin="0 0 0 10">
+                    <StackPanel
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal">
+                        <Image
+                            Source="/Assets/image/clock.png"
+                            VerticalAlignment="Center"
+                            Width="40"
+                            Height="40">
+                        </Image>
+                        <TextBlock
+                            FontFamily="/Assets/OpenSans-ExtraBold.ttf#Sans"
+                            FontSize="14"
+                            Foreground="White"
+                            VerticalAlignment="Center"
+                            TextAlignment="Center"
+                            TextWrapping="Wrap">
+                            Execution&#x0a;Time
+                        </TextBlock>
+                    </StackPanel>
+                    <Label
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="20"
+                        x:Name="ExecutionTimeLabel">
                     </Label>
                 </Grid>
                 <Grid
-                    Grid.Row="1"
-                    ColumnDefinitions="*,*">
-
-                    <!-- BFS -->
-                    <RadioButton
+                    ColumnDefinitions="1*,1*"
+                    Margin="0 0 0 10">
+                    <StackPanel
                         Grid.Column="0"
-                        GroupName="Algorithm"
-                        Content="BFS"
-                        x:Name="BfsRadioButton">
-                    </RadioButton>
-
-                    <!-- DFS -->
-                    <RadioButton
-                        x:Name="DfsRadioButton"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal">
+                        <Image
+                            Source="/Assets/image/footstep.png"
+                            VerticalAlignment="Center"
+                            Width="40"
+                            Height="40">
+                        </Image>
+                        <Label
+                            FontSize="20"
+                            VerticalAlignment="Center">
+                            Steps
+                        </Label>
+                    </StackPanel>
+                    <Label
                         Grid.Column="1"
-                        GroupName="Algorithm"
-                        Content="DFS">
-                    </RadioButton>
-
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="20"
+                        x:Name="StepsLabel">
+                    </Label>
                 </Grid>
-
-                <!-- TSP -->
-                <CheckBox
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    Content="TSP"
-                    x:Name="TspCheckBox">
-                </CheckBox>
-            </Grid>
-
-            <!-- Search -->
-            <Button
-                x:Name="SearchButton"
-                Grid.Column="2"
-                Height="80"
-                Width="100"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                HorizontalContentAlignment="Center"
-                VerticalContentAlignment="Center"
-                Foreground="White"
-                Background="#ff7fa5"
-                Content="Explore!"
-                Click="SearchButton_Click">
-                <!--<Image Stretch="None" Source="{Binding Converter=}">
-                </Image>-->
-
-                <!-- Command="{Binding SearchResult}"
-				    Command="{Binding Grid, ElementName=mazeVisulaization}"-->
-            </Button>
+                <Grid
+                    ColumnDefinitions="1*,1*"
+                    Margin="0 0 0 10">
+                    <StackPanel
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal">
+                        <Image
+                            Source="/Assets/image/nodes.png"
+                            VerticalAlignment="Center"
+                            Width="40"
+                            Height="40">
+                        </Image>
+                        <Label
+                            FontSize="20"
+                            VerticalAlignment="Center">
+                            Nodes
+                        </Label>
+                    </StackPanel>
+                    <Label
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="20"
+                        x:Name="NodesLabel">
+                    </Label>
+                </Grid>
+                <StackPanel
+                    Orientation="Vertical"
+                    Margin="0 0 0 10">
+                    <Image
+                        Source="/Assets/image/route.png"
+                        HorizontalAlignment="Center"
+                        Width="50"
+                        Height="50">
+                    </Image>
+                    <Label
+                        FontSize="20"
+                        HorizontalAlignment="Center">
+                        Routes
+                    </Label>
+                </StackPanel>
+                <TextBlock
+                    FontFamily="/Assets/JetBrainsMono.ttf#JetBrainsMono"
+                    FontSize="20"
+                    Foreground="White"
+                    TextAlignment="Left"
+                    TextWrapping="Wrap"
+                    Margin="20 0"
+                    x:Name="RouteTextBlock">
+                </TextBlock>
+            </StackPanel>
         </Grid>
+
     </Grid>
 </Window>
