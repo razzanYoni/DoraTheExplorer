@@ -4,5 +4,7 @@
 
     <Application.Styles>
         <FluentTheme Mode="Light"/>
+        <StyleInclude
+            Source="avares://DoraTheExplorer/Assets/Icons.axaml"></StyleInclude>
     </Application.Styles>
 </Application>
