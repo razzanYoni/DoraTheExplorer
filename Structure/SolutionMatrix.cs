@@ -48,4 +48,11 @@ public class SolutionMatrix
         _states.Clear();
         _states.AddRange(states);
     }
+
+    public void Clear()
+    {
+        this._states.Clear();
+        this._treasureLocations.Clear();
+        this._cells.Clear();
+    }
 }

@@ -1,42 +1,11 @@
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Avalonia.Media;
 using DoraTheExplorer.Structure;
-using DynamicData;
 
 namespace DoraTheExplorer.Util;
 
 public class Utils
 {
-    public class ResultJSONItem
-    {
-        public List<Coordinate> visitedLocations;
-        public List<Coordinate> backtrackLocations;
-        public Coordinate CurrentLocation;
-    }
-
-    public static T? Deserialize<T>(string filepath)
-    {
-        string jsonString = File.ReadAllText(filepath);
-        return JsonSerializer.Deserialize<T>(filepath);
-    }
-
-    public static async Task WriteToJSONFileAsync<T>(string filePath, T data)
-    {
-        string jsonString = JsonSerializer.Serialize(data);
-
-        filePath = filePath.Substring(0, filePath.Length - 4);
-
-        System.IO.FileInfo file = new System.IO.FileInfo("./Result/" + filePath + ".json");
-        file.Directory?.Create(); // If the directory already exists, this method does nothing.
-
-        await File.WriteAllTextAsync(file.FullName, jsonString);
-    }
-
     public static (SolutionMatrix?, Graph<Coordinate>?, bool) ReadFile(string path)
     {
         string[] lines = System.IO.File.ReadAllLines(path);
