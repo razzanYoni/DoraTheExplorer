@@ -2,7 +2,7 @@ using System;
 
 namespace DoraTheExplorer.Structure;
 
-public readonly struct Coordinate : IEquatable<Coordinate>
+public class Coordinate : IEquatable<Coordinate>
 {
     public readonly int x;
     public readonly int y;
@@ -12,14 +12,30 @@ public readonly struct Coordinate : IEquatable<Coordinate>
         this.x = x;
         this.y = y;
     }
-
-    public bool Equals(Coordinate other)
+    
+    public Coordinate(Coordinate other)
     {
-        return this.x == other.x && this.y == other.y;
+        x = other.x;
+        y = other.y;
+    }
+
+    public bool Equals(Coordinate? other)
+    {
+        return other is not null && x == other.x && y == other.y;
     }
 
     public override string ToString()
     {
         return $"({x}, {y})";
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as Coordinate);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(x, y);
     }
 }

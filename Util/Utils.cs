@@ -82,7 +82,8 @@ public class Utils
 
                     if (lines[i][j] == 'K')
                     {
-                        solutionMatrix.AddState(new State(new Coordinate(j, i)));
+                        solutionMatrix.AddState(new CompressedState(new Coordinate(j, i), solutionMatrix.Width,
+                            solutionMatrix.Height));
                     }
 
                     if (lines[i][j] == 'T')
@@ -113,16 +114,16 @@ public class Utils
             switch (delta)
             {
                 case (0, -1):
-                    res.Add('L');
-                    break;
-                case (-1, 0):
                     res.Add('U');
                     break;
+                case (-1, 0):
+                    res.Add('L');
+                    break;
                 case (0, 1):
-                    res.Add('R');
+                    res.Add('D');
                     break;
                 case (1, 0):
-                    res.Add('D');
+                    res.Add('R');
                     break;
                 default:
                     // throw new UnreachableException("Tidak mungkin ada |delta| > 1");

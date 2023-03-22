@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace DoraTheExplorer.Structure;
 
-public struct State
+public class State
 {
     public readonly List<Coordinate> VisitedLocations;
     public readonly List<Coordinate> BacktrackLocations;

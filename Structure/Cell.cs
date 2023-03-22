@@ -1,7 +1,7 @@
 namespace DoraTheExplorer.Structure;
 
 // for visualization purpose
-public struct Cell
+public class Cell
 {
     public readonly Coordinate Coord;
     public readonly bool Visitable;
