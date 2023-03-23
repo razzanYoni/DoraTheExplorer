@@ -7,6 +7,8 @@ namespace DoraTheExplorer.Views;
 
 public partial class DialogWindow : Window
 {
+    public DialogWindow() { }
+
     public DialogWindow(string message)
     {
         InitializeComponent();
