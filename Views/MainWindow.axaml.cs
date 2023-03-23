@@ -46,6 +46,8 @@ public partial class MainWindow : Window
     private readonly Image _doraImage;
     private readonly Image _closedTreasureImage;
     private readonly Image _openedTreasureImage;
+    private readonly Image _dirtImage;
+    private readonly Image _grassImage;
     private readonly Image _footsteps;
 
     // Media Player
@@ -93,6 +95,8 @@ public partial class MainWindow : Window
         _doraImage = new Image { Source = LoadBitmap("dora.png") };
         _closedTreasureImage = new Image { Source = LoadBitmap("treasure-chest-closed.png") };
         _openedTreasureImage = new Image { Source = LoadBitmap("treasure-chest-opened.png") };
+        _dirtImage = new Image { Source = LoadBitmap("dirt.png") };
+        _grassImage = new Image { Source = LoadBitmap("grass.png") };
         var footstepBitmap = LoadBitmap("footsteps.png");
         _footsteps = new Image { Source = footstepBitmap, RenderTransform = new RotateTransform(0) };
     }
@@ -167,11 +171,10 @@ public partial class MainWindow : Window
                     {
                         new Border
                         {
-                            Width = size,
-                            Height = size,
-                            Background = Brushes.Azure,
                             BorderBrush = Brushes.Black,
-                            BorderThickness = new Thickness(1)
+                            BorderThickness = new Thickness(.5),
+                            Width = size,
+                            Height = size
                         }
                     }
                 };
@@ -184,9 +187,9 @@ public partial class MainWindow : Window
         ClearCells();
         // start cell
         var startCoord = _solutionMatrix.States[0].CurrentLocation;
+        _cells[startCoord.Y, startCoord.X].Children.Add(new Image { Source = _dirtImage.Source, Width = size, });
         _cells[startCoord.Y, startCoord.X].Children
             .Add(new Image { Source = _doraImage.Source, Height = _doraImage.Height });
-        _cells[startCoord.Y, startCoord.X].Background = Brushes.White;
 
         foreach (var c in _solutionMatrix.Cells)
         {
@@ -194,17 +197,14 @@ public partial class MainWindow : Window
             var cell = _cells[coord.Y, coord.X];
             if (_solutionMatrix.TreasureLocations.ToList().Any(coordinate => coordinate.Equals(coord)))
             {
+                cell.Children.Add(new Image { Source = _dirtImage.Source, Width = size, });
                 cell.Children.Add(new Image
-                {
-                    Source = _closedTreasureImage.Source,
-                    Width = _closedTreasureImage.Width,
-                    Height = _closedTreasureImage.Height
-                });
+                    { Source = _closedTreasureImage.Source, Width = _closedTreasureImage.Width, });
             }
             else if (!c.Coord.Equals(startCoord))
             {
-                var color = c.Visitable ? Brushes.Azure : Brushes.Black;
-                (cell.Children.First(control => control is Border) as Border)!.Background = color;
+                cell.Children.Add(new Image
+                    { Source = c.Visitable ? _dirtImage.Source : _grassImage.Source, Width = size, });
             }
         }
     }
@@ -265,7 +265,7 @@ public partial class MainWindow : Window
         watch.Stop();
         var elapsedMs = watch.Elapsed;
         _executionTimeLabel.Content = elapsedMs.TotalMilliseconds + " ms";
-        _routeTextBlock.Text = string.Join(" ", Utils.ConvertRoute(path!));
+        _routeTextBlock.Text = string.Join(" ", Utils.ConvertRoute(path!)) + " ";
         _stepsLabel.Content = (path!.Count - 1);
         _nodesLabel.Content = states.Count;
 
@@ -307,7 +307,7 @@ public partial class MainWindow : Window
         while (_isPlayed && _mazeSlider.Value < _mazeSlider.Maximum)
         {
             _mazeSlider.Value += 1;
-            await WorkAsync();
+            await Task.Run(() => Thread.Sleep(100));
         }
 
         _isPlayed = false;
@@ -324,16 +324,14 @@ public partial class MainWindow : Window
         _mazeSlider.Value = 0;
     }
 
-    private Task WorkAsync()
-    {
-        return !_isPlayed ? Task.CompletedTask : Task.Run(() => { Thread.Sleep(200); });
-    }
-
     private void ClearCells()
     {
         foreach (var p in _cells)
         {
-            foreach (var c in p.Children.Where(c => c is not Border).ToList())
+            var filter = p.Children.Where(c =>
+                c is not Border && c is Image image && image.Source != _dirtImage.Source &&
+                image.Source != _grassImage.Source).ToList();
+            foreach (var c in filter)
             {
                 p.Children.Remove(c);
             }

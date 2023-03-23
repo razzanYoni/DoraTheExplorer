@@ -81,7 +81,7 @@ public static class Utils
             }
         }
 
-        return (solutionMatrix, graph, true ? countStart == 1 : false);
+        return (solutionMatrix, graph, countStart == 1);
     }
 
     public static IEnumerable<char> ConvertRoute(List<Coordinate> route)
