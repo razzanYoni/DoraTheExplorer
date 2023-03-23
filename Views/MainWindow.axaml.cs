@@ -22,10 +22,6 @@ using DoraTheExplorer.Util;
 
 namespace DoraTheExplorer.Views;
 
-// TODO : Async Task to load image
-// TODO : fix bug big maze
-// TODO : Scroll viewer di routes
-
 public partial class MainWindow : Window
 {
     // Input
@@ -149,7 +145,7 @@ public partial class MainWindow : Window
         var col = _solutionMatrix.Width;
         _mazeRows = new StackPanel[row];
         _cells = new Panel[row, col];
-        var size = Math.Min(600 / row, 800 / col);
+        var size = Math.Max(Math.Min(600 / row, 800 / col), 40);
         _doraImage.Height = size;
         _closedTreasureImage.Width = size * .6;
         _openedTreasureImage.Width = size * .6;
@@ -291,7 +287,7 @@ public partial class MainWindow : Window
         {
             for (var i = 0; i < _solutionMatrix.Path.Length; i++)
             {
-                var (x, y) = (x: _solutionMatrix.Path[i].X, y: _solutionMatrix.Path[i].Y);
+                var (x, y) = (_solutionMatrix.Path[i].X, _solutionMatrix.Path[i].Y);
                 int dir;
                 if (i > 0)
                 {
@@ -351,7 +347,7 @@ public partial class MainWindow : Window
 
         foreach (var treasureLocation in _solutionMatrix.TreasureLocations)
         {
-            var (x, y) = (x: treasureLocation.X, y: treasureLocation.Y);
+            var (x, y) = (treasureLocation.X, treasureLocation.Y);
             if (state.IsVisited(treasureLocation) || state.IsBacktracked(treasureLocation) ||
                 state.IsSavedVisited(treasureLocation))
             {

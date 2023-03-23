@@ -3,7 +3,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:vm="using:DoraTheExplorer.ViewModels"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:unicode="clr-namespace:Avalonia.Media.TextFormatting.Unicode;assembly=Avalonia.Visuals"
         mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="720"
         x:Class="DoraTheExplorer.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -23,8 +22,6 @@
     <Window.Resources>
         <ResourceDictionary>
             <!--We set the XAML resource-->
-            <SolidColorBrush x:Key="StatusCell"
-                             Color="Green" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -36,7 +33,7 @@
             </Setter>
             <Setter
                 Property="Background"
-                Value="#FFFFFF">
+                Value="White">
             </Setter>
             <Setter
                 Property="Foreground"
@@ -109,18 +106,26 @@
                 Grid.Column="0"
                 RowDefinitions="600,40,*">
 
-                <StackPanel
+                <ScrollViewer
                     Grid.Row="0"
-                    HorizontalAlignment="Center"
-                    Background="Black"
-                    Orientation="Vertical"
-                    x:Name="MazePanel">
+                    MaxWidth="800"
+                    MaxHeight="600"
+                    HorizontalScrollBarVisibility="Auto"
+                    AllowAutoHide="True">
+                    <StackPanel
+                        Grid.Row="0"
+                        HorizontalAlignment="Center"
+                        Background="Black"
+                        Orientation="Vertical"
+                        x:Name="MazePanel">
 
-                    <Image
-                        Source="/Assets/image/dora-logo-kelompok.png"
-                        HorizontalAlignment="Center" />
+                        <Image
+                            Source="/Assets/image/dora-logo-kelompok.png"
+                            MaxWidth="800"
+                            HorizontalAlignment="Center" />
 
-                </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
 
                 <!-- Slider -->
                 <Grid
@@ -134,7 +139,8 @@
                         Click="PlayButton_Click"
                         Background="Transparent">
                         <PathIcon
-                            Data="{StaticResource play_regular}"></PathIcon>
+                            Data="{StaticResource play_regular}">
+                        </PathIcon>
                     </Button>
                     <Button
                         Grid.Column="1"
@@ -142,7 +148,8 @@
                         Background="Transparent"
                         Click="PauseButton_Click">
                         <PathIcon
-                            Data="{StaticResource pause_regular}"></PathIcon>
+                            Data="{StaticResource pause_regular}">
+                        </PathIcon>
                     </Button>
                     <Button
                         Grid.Column="2"
@@ -150,7 +157,8 @@
                         Background="Transparent"
                         Click="ResetButton_Click">
                         <Image
-                                Source="{SvgImage /Assets/reset-button.svg}"></Image>
+                            Source="{SvgImage /Assets/reset-button.svg}">
+                        </Image>
                     </Button>
                     <Slider
                         VerticalAlignment="Top"
@@ -390,7 +398,10 @@
                         Routes
                     </Label>
                 </StackPanel>
-                <ScrollViewer>
+                <ScrollViewer
+                    HorizontalAlignment="Center"
+                    MaxHeight="250"
+                    AllowAutoHide="True">
                     <TextBlock
                         FontFamily="/Assets/JetBrainsMono.ttf#JetBrainsMono"
                         FontSize="20"
