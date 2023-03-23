@@ -4,8 +4,17 @@ using DoraTheExplorer.Structure;
 
 namespace DoraTheExplorer.Util;
 
-public class Utils
+public static class Utils
 {
+    public enum Direction
+    {
+        Up,
+        Right,
+        Down,
+        Left,
+        Unknown
+    }
+
     public static (SolutionMatrix?, Graph<Coordinate>?, bool) ReadFile(string path)
     {
         string[] lines = System.IO.File.ReadAllLines(path);
@@ -22,13 +31,11 @@ public class Utils
 
         var solutionMatrix = new SolutionMatrix(col, row);
         var graph = new Graph<Coordinate>();
-        Vertex<Coordinate>[,] vertices = new Vertex<Coordinate>[row, col];
+        var vertices = new Vertex<Coordinate>[row, col];
 
-        int[,] matrix = new int[row, col];
-
-        for (int i = 0; i < row; i++)
+        for (var i = 0; i < row; i++)
         {
-            for (int j = 0; j < col; j++)
+            for (var j = 0; j < col; j++)
             {
                 if (lines[i][j] != 'X')
                 {
@@ -72,38 +79,44 @@ public class Utils
         return (solutionMatrix, graph, true);
     }
 
-    public static char[] ConvertRoute(List<Coordinate> route)
+    public static IEnumerable<char> ConvertRoute(List<Coordinate> route)
     {
         var res = new List<char>();
-        for (int i = 0; i < route.Count - 1; i++)
+        for (var i = 0; i < route.Count - 1; i++)
         {
-            var c1 = route[i];
-            var c2 = route[i + 1];
-            var delta = (c2.x - c1.x, c2.y - c1.y);
-            switch (delta)
+            switch (DetermineDirection(route[i], route[i + 1]))
             {
-                case (0, -1):
-                    res.Add('U');
+                case Direction.Up:
+                    res.Add('\uf0aa');
                     break;
-                case (-1, 0):
-                    res.Add('L');
+                case Direction.Left:
+                    res.Add('\uf0a8');
                     break;
-                case (0, 1):
-                    res.Add('D');
+                case Direction.Down:
+                    res.Add('\uf0ab');
                     break;
-                case (1, 0):
-                    res.Add('R');
-                    break;
-                default:
-                    // throw new UnreachableException("Tidak mungkin ada |delta| > 1");
+                case Direction.Right:
+                    res.Add('\uf0a9');
                     break;
             }
         }
-
-        return res.ToArray();
+        return res;
     }
 
-    public static ISolidColorBrush Darken(ISolidColorBrush? color, double factor)
+    public static Direction DetermineDirection(Coordinate start, Coordinate end)
+    {
+        var delta = (end.X - start.X, end.Y - start.Y);
+        return delta switch
+        {
+            (0, -1) => Direction.Up,
+            (-1, 0) => Direction.Left,
+            (0, 1) => Direction.Down,
+            (1, 0) => Direction.Right,
+            _ => Direction.Unknown
+        };
+    }
+
+    public static ISolidColorBrush Darken(ISolidColorBrush color, double factor)
     {
         var r = color.Color.R;
         var g = color.Color.G;

@@ -4,29 +4,29 @@ namespace DoraTheExplorer.Structure;
 
 public class Coordinate : IEquatable<Coordinate>
 {
-    public readonly int x;
-    public readonly int y;
+    public readonly int X;
+    public readonly int Y;
 
     public Coordinate(int x, int y)
     {
-        this.x = x;
-        this.y = y;
+        this.X = x;
+        this.Y = y;
     }
     
     public Coordinate(Coordinate other)
     {
-        x = other.x;
-        y = other.y;
+        X = other.X;
+        Y = other.Y;
     }
 
     public bool Equals(Coordinate? other)
     {
-        return other is not null && x == other.x && y == other.y;
+        return other is not null && X == other.X && Y == other.Y;
     }
 
     public override string ToString()
     {
-        return $"({x}, {y})";
+        return $"({X}, {Y})";
     }
 
     public override bool Equals(object? obj)
@@ -36,6 +36,6 @@ public class Coordinate : IEquatable<Coordinate>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(x, y);
+        return HashCode.Combine(X, Y);
     }
 }

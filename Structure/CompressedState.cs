@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using DoraTheExplorer.Util;
 
 namespace DoraTheExplorer.Structure;
 
 public class CompressedState
 {
     public Coordinate CurrentLocation;
+    public Utils.Direction Dir = Utils.Direction.Up;
     private readonly int[] _visitedLocations;
     private readonly int[] _backtrackLocations;
     private readonly int[] _savedVisitedLocations;
@@ -28,6 +30,7 @@ public class CompressedState
     public CompressedState(CompressedState other)
     {
         CurrentLocation = other.CurrentLocation;
+        Dir = other.Dir;
         _width = other._width;
         _height = other._height;
         _history = new Stack<Coordinate>(other._history);
@@ -93,7 +96,7 @@ public class CompressedState
 
     private (int, int) Calculate(Coordinate coordinate)
     {
-        var n = coordinate.y * _width + coordinate.x;
+        var n = coordinate.Y * _width + coordinate.X;
         var (idx, bit) = Math.DivRem(n, sizeof(int) * 8);
         return (idx, bit);
     }

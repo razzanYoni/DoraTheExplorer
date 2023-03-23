@@ -8,7 +8,7 @@ public class Cell
 
     public Cell(Coordinate coord, bool visitable)
     {
-        this.Coord = coord;
-        this.Visitable = visitable;
+        Coord = coord;
+        Visitable = visitable;
     }
 }

@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using DoraTheExplorer.Structure;
 using System.Linq;
+using DoraTheExplorer.Util;
 
 namespace DoraTheExplorer.Algorithm;
 
-public class DFSSolver
+public static class DfsSolver
 {
-    public static void DFS<T>(Graph<T> graph, T startVertexInfo)
+    public static void Dfs<T>(Graph<T> graph, T startVertexInfo)
         where T : IEquatable<T>
     {
         var vertices = graph.Vertices;
@@ -15,32 +16,32 @@ public class DFSSolver
             return;
         var visited = new HashSet<int>();
         var start = vertices.Where(e => e.Info.Equals(startVertexInfo)).FirstOrDefault(vertices[0]);
-        DFSImpl<T>(visited, start);
+        DfsImpl(visited, start);
     }
 
-    private static void DFSImpl<T>(HashSet<int> visited, Vertex<T> start)
+    private static void DfsImpl<T>(HashSet<int> visited, Vertex<T> start)
         where T : notnull
     {
         visited.Add(start.Id);
         Console.Write(start.Info + " ");
         if (start.Right is not null && !visited.Contains(start.Right.Id))
         {
-            DFSImpl(visited, start.Right);
+            DfsImpl(visited, start.Right);
         }
 
         if (start.Down is not null && !visited.Contains(start.Down.Id))
         {
-            DFSImpl(visited, start.Down);
+            DfsImpl(visited, start.Down);
         }
 
         if (start.Left is not null && !visited.Contains(start.Left.Id))
         {
-            DFSImpl(visited, start.Left);
+            DfsImpl(visited, start.Left);
         }
 
         if (start.Up is not null && !visited.Contains(start.Up.Id))
         {
-            DFSImpl(visited, start.Up);
+            DfsImpl(visited, start.Up);
         }
     }
 
@@ -108,6 +109,11 @@ public class DFSSolver
             v = q.Pop();
             t = track.Pop();
             state.CurrentLocation = v.Info;
+            if (t.Count > 1)
+            {
+                state.Dir = Utils.DetermineDirection(t[^2], t[^1]);
+            }
+
             if (v.Info.Equals(goal))
             {
                 states.Add(new CompressedState(state));
@@ -177,6 +183,7 @@ public class DFSSolver
             }
         }
 
+        states[0].Dir = states[1].Dir;
         return (path.Count > 0 ? path : null, states);
     }
 }

@@ -6,6 +6,7 @@ public class SolutionMatrix
 {
     public readonly int Width;
     public readonly int Height;
+    private readonly List<Coordinate> _path;
     private readonly List<Cell> _cells;
     private readonly List<CompressedState> _states;
     private readonly List<Coordinate> _treasureLocations;
@@ -13,12 +14,14 @@ public class SolutionMatrix
     public IEnumerable<Cell> Cells => _cells.ToArray();
     public CompressedState[] States => _states.ToArray();
     public Coordinate[] TreasureLocations => _treasureLocations.ToArray();
+    public Coordinate[] Path => _path.ToArray();
 
     public SolutionMatrix(int width, int height)
     {
         _states = new List<CompressedState>();
         _treasureLocations = new List<Coordinate>();
         _cells = new List<Cell>();
+        _path = new List<Coordinate>();
         Width = width;
         Height = height;
     }
@@ -37,22 +40,23 @@ public class SolutionMatrix
     {
         _cells.Add(cell);
     }
-    
-    public void AddStates(IEnumerable<CompressedState> states)
-    {
-        _states.AddRange(states);
-    }
-    
+
     public void SetStates(IEnumerable<CompressedState> states)
     {
         _states.Clear();
         _states.AddRange(states);
     }
 
+    public void SetPath(IEnumerable<Coordinate> path)
+    {
+        _path.Clear();
+        _path.AddRange(path);
+    }
+
     public void Clear()
     {
-        this._states.Clear();
-        this._treasureLocations.Clear();
-        this._cells.Clear();
+        _states.Clear();
+        _treasureLocations.Clear();
+        _cells.Clear();
     }
 }

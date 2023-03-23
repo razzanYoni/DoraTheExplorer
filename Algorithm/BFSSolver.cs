@@ -2,21 +2,22 @@
 using System.Collections.Generic;
 using DoraTheExplorer.Structure;
 using System.Linq;
+using DoraTheExplorer.Util;
 
 namespace DoraTheExplorer.Algorithm;
 
-public class BFSSolver
+public static class BfsSolver
 {
-    public static void BFS<T>(Graph<T> graph, T startVertexInfo) where T : IEquatable<T>
+    public static void Bfs<T>(Graph<T> graph, T startVertexInfo) where T : IEquatable<T>
     {
         var vertices = graph.Vertices;
         if (vertices.Length == 0) return;
         var visited = new HashSet<int>();
         var start = vertices.Where(e => e.Info.Equals(startVertexInfo)).FirstOrDefault(vertices[0]);
-        BFSImpl<T>(visited, start);
+        BfsImpl(visited, start);
     }
 
-    private static void BFSImpl<T>(HashSet<int> visited, Vertex<T> start) where T : notnull
+    private static void BfsImpl<T>(HashSet<int> visited, Vertex<T> start) where T : notnull
     {
         var q = new Queue<Vertex<T>>();
         q.Enqueue(start);
@@ -52,7 +53,8 @@ public class BFSSolver
         }
     }
 
-    public static (List<Coordinate>?, List<CompressedState>) FindPath(Graph<Coordinate> graph, CompressedState initialState,
+    public static (List<Coordinate>?, List<CompressedState>) FindPath(Graph<Coordinate> graph,
+        CompressedState initialState,
         IEnumerable<Coordinate> goals, bool tsp = false)
     {
         var start = initialState.CurrentLocation;
@@ -64,16 +66,14 @@ public class BFSSolver
         {
             var shortestGoal = goalSet[0];
             var (shortestPath, shortestStates) = FindPath(graph, new CompressedState(state), shortestGoal);
-            for (int i = 1; i < goalSet.Count; i++)
+            for (var i = 1; i < goalSet.Count; i++)
             {
                 var goal = goalSet[i];
                 var (path, states) = FindPath(graph, new CompressedState(state), goal);
-                if (states.Count < shortestStates.Count)
-                {
-                    shortestPath = path;
-                    shortestStates = states;
-                    shortestGoal = goal;
-                }
+                if (states.Count >= shortestStates.Count) continue;
+                shortestPath = path;
+                shortestStates = states;
+                shortestGoal = goal;
             }
 
             if (shortestPath is not null) paths.Add(shortestPath);
@@ -119,6 +119,11 @@ public class BFSSolver
             v = q.Dequeue();
             t = track.Dequeue();
             state.CurrentLocation = v.Info;
+            if (t.Count > 1)
+            {
+                state.Dir = Utils.DetermineDirection(t[^2], t[^1]);
+            }
+
             if (v.Info.Equals(goal))
             {
                 states.Add(new CompressedState(state));
@@ -188,6 +193,7 @@ public class BFSSolver
             }
         }
 
+        states[0].Dir = states[1].Dir;
         return (path.Count > 0 ? path : null, states);
     }
 }

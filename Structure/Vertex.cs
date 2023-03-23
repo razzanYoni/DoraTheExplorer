@@ -3,7 +3,7 @@
 public class Vertex<T>
     where T : notnull
 {
-    private static int _id = 0;
+    private static int _id;
     public readonly int Id;
     public T Info;
     private Vertex<T>? _left;
@@ -13,8 +13,8 @@ public class Vertex<T>
 
     public Vertex(T info)
     {
-        this.Info = info;
-        this.Id = _id;
+        Info = info;
+        Id = _id;
         _id++;
     }
 
@@ -37,25 +37,25 @@ public class Vertex<T>
 
     public void ConnectLeft(Vertex<T> left)
     {
-        this._left = left;
+        _left = left;
         left._right = this;
     }
 
     public void ConnectRight(Vertex<T> right)
     {
-        this._right = right;
+        _right = right;
         right._left = this;
     }
 
     public void ConnectUp(Vertex<T> up)
     {
-        this._up = up;
+        _up = up;
         up._down = this;
     }
 
     public void ConnectDown(Vertex<T> down)
     {
-        this._down = down;
+        _down = down;
         down._up = this;
     }
 }

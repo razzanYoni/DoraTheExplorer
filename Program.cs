@@ -1,20 +1,11 @@
 ﻿using Avalonia;
-using Avalonia.Skia;
 using System;
-using Avalonia.Skia.Helpers;
-using System.Collections.Generic;
-using DoraTheExplorer.Structure;
-using DoraTheExplorer.Algorithm;
-using System.Reflection;
-using Avalonia.Dialogs;
 using Avalonia.ReactiveUI;
 using Avalonia.Svg.Skia;
-using Microsoft.VisualBasic.CompilerServices;
-using Utils = DoraTheExplorer.Util.Utils;
 
 namespace DoraTheExplorer;
 
-class Program
+internal static class Program
 {
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -24,7 +15,7 @@ class Program
         .StartWithClassicDesktopLifetime(args);
 
     // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp()
+    private static AppBuilder BuildAvaloniaApp()
     {
         GC.KeepAlive(typeof(SvgImageExtension).Assembly);
         GC.KeepAlive(typeof(Avalonia.Svg.Skia.Svg).Assembly);
