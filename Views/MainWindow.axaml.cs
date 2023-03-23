@@ -211,7 +211,7 @@ public partial class MainWindow : Window
     public async void SearchButton_Click(object sender, RoutedEventArgs e)
     {
         /* Run Time */
-        if (!_isNotError || _graph is null || _solutionMatrix is null || _solutionMatrix.TreasureLocations.Length == 0)
+        if (!_isNotError || _graph is null || _solutionMatrix is null || _solutionMatrix.TreasureLocations.Count == 0)
         {
             // send alert
             Debug.WriteLine("Belum ada file\n");
@@ -278,14 +278,14 @@ public partial class MainWindow : Window
     {
         _mazeSlider = (sender as Slider)!;
         if (e.Property.Name != "Value" || _solutionMatrix is null ||
-            _solutionMatrix.States.Length == 0) return;
+            _solutionMatrix.States.Count == 0) return;
         var idx = (int)_mazeSlider.Value;
         Coordinate? loc;
         ClearCells();
 
-        if (idx >= _solutionMatrix.States.Length)
+        if (idx >= _solutionMatrix.States.Count)
         {
-            for (var i = 0; i < _solutionMatrix.Path.Length; i++)
+            for (var i = 0; i < _solutionMatrix.Path.Count; i++)
             {
                 var (x, y) = (_solutionMatrix.Path[i].X, _solutionMatrix.Path[i].Y);
                 int dir;
@@ -373,7 +373,7 @@ public partial class MainWindow : Window
 
     private async void PlayButton_Click(object sender, RoutedEventArgs e)
     {
-        if (_solutionMatrix?.States.Length == 0 ||
+        if (_solutionMatrix?.States.Count == 0 ||
             Math.Abs(_mazeSlider.Value - _mazeSlider.Maximum) < double.Epsilon) return;
         _isPlayed = true;
 
