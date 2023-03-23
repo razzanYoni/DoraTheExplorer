@@ -17,6 +17,7 @@ public static class Utils
 
     public static (SolutionMatrix?, Graph<Coordinate>?, bool) ReadFile(string path)
     {
+        int countStart = 0;
         string[] lines = System.IO.File.ReadAllLines(path);
         int row = lines.Length;
         int col = lines[0].Replace(" ", "").Length;
@@ -60,6 +61,10 @@ public static class Utils
                     {
                         solutionMatrix.AddState(new CompressedState(new Coordinate(j, i), solutionMatrix.Width,
                             solutionMatrix.Height));
+                        if (++countStart > 1)
+                        {
+                            return (null, null, false);
+                        }
                     }
 
                     if (lines[i][j] == 'T')
@@ -76,7 +81,7 @@ public static class Utils
             }
         }
 
-        return (solutionMatrix, graph, true);
+        return (solutionMatrix, graph, true ? countStart == 1 : false);
     }
 
     public static IEnumerable<char> ConvertRoute(List<Coordinate> route)
