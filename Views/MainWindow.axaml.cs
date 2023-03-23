@@ -14,6 +14,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Threading;
 using DoraTheExplorer.Algorithm;
 using DoraTheExplorer.Structure;
 using DoraTheExplorer.Util;
@@ -21,10 +22,6 @@ using DoraTheExplorer.Util;
 // ReSharper disable UnusedParameter.Local
 
 namespace DoraTheExplorer.Views;
-
-// TODO : Async Task to load image
-// TODO : fix bug big maze
-// TODO : Scroll viewer di routes
 
 public partial class MainWindow : Window
 {
@@ -49,6 +46,8 @@ public partial class MainWindow : Window
     private readonly Image _doraImage;
     private readonly Image _closedTreasureImage;
     private readonly Image _openedTreasureImage;
+    private readonly Image _dirtImage;
+    private readonly Image _grassImage;
     private readonly Image _footsteps;
 
     // Media Player
@@ -96,6 +95,8 @@ public partial class MainWindow : Window
         _doraImage = new Image { Source = LoadBitmap("dora.png") };
         _closedTreasureImage = new Image { Source = LoadBitmap("treasure-chest-closed.png") };
         _openedTreasureImage = new Image { Source = LoadBitmap("treasure-chest-opened.png") };
+        _dirtImage = new Image { Source = LoadBitmap("dirt.png") };
+        _grassImage = new Image { Source = LoadBitmap("grass.png") };
         var footstepBitmap = LoadBitmap("footsteps.png");
         _footsteps = new Image { Source = footstepBitmap, RenderTransform = new RotateTransform(0) };
     }
@@ -149,7 +150,7 @@ public partial class MainWindow : Window
         var col = _solutionMatrix.Width;
         _mazeRows = new StackPanel[row];
         _cells = new Panel[row, col];
-        var size = Math.Min(600 / row, 800 / col);
+        var size = Math.Max(Math.Min(600 / row, 800 / col), 40);
         _doraImage.Height = size;
         _closedTreasureImage.Width = size * .6;
         _openedTreasureImage.Width = size * .6;
@@ -170,11 +171,10 @@ public partial class MainWindow : Window
                     {
                         new Border
                         {
-                            Width = size,
-                            Height = size,
-                            Background = Brushes.Azure,
                             BorderBrush = Brushes.Black,
-                            BorderThickness = new Thickness(1)
+                            BorderThickness = new Thickness(.5),
+                            Width = size,
+                            Height = size
                         }
                     }
                 };
@@ -187,9 +187,9 @@ public partial class MainWindow : Window
         ClearCells();
         // start cell
         var startCoord = _solutionMatrix.States[0].CurrentLocation;
+        _cells[startCoord.Y, startCoord.X].Children.Add(new Image { Source = _dirtImage.Source, Width = size, });
         _cells[startCoord.Y, startCoord.X].Children
             .Add(new Image { Source = _doraImage.Source, Height = _doraImage.Height });
-        _cells[startCoord.Y, startCoord.X].Background = Brushes.White;
 
         foreach (var c in _solutionMatrix.Cells)
         {
@@ -197,17 +197,14 @@ public partial class MainWindow : Window
             var cell = _cells[coord.Y, coord.X];
             if (_solutionMatrix.TreasureLocations.ToList().Any(coordinate => coordinate.Equals(coord)))
             {
+                cell.Children.Add(new Image { Source = _dirtImage.Source, Width = size, });
                 cell.Children.Add(new Image
-                {
-                    Source = _closedTreasureImage.Source,
-                    Width = _closedTreasureImage.Width,
-                    Height = _closedTreasureImage.Height
-                });
+                    { Source = _closedTreasureImage.Source, Width = _closedTreasureImage.Width, });
             }
             else if (!c.Coord.Equals(startCoord))
             {
-                var color = c.Visitable ? Brushes.Azure : Brushes.Black;
-                (cell.Children.First(control => control is Border) as Border)!.Background = color;
+                cell.Children.Add(new Image
+                    { Source = c.Visitable ? _dirtImage.Source : _grassImage.Source, Width = size, });
             }
         }
     }
@@ -215,7 +212,7 @@ public partial class MainWindow : Window
     public async void SearchButton_Click(object sender, RoutedEventArgs e)
     {
         /* Run Time */
-        if (!_isNotError || _graph is null || _solutionMatrix is null || _solutionMatrix.TreasureLocations.Length == 0)
+        if (!_isNotError || _graph is null || _solutionMatrix is null || _solutionMatrix.TreasureLocations.Count == 0)
         {
             // send alert
             Debug.WriteLine("Belum ada file\n");
@@ -268,7 +265,7 @@ public partial class MainWindow : Window
         watch.Stop();
         var elapsedMs = watch.Elapsed;
         _executionTimeLabel.Content = elapsedMs.TotalMilliseconds + " ms";
-        _routeTextBlock.Text = string.Join(" ", Utils.ConvertRoute(path!));
+        _routeTextBlock.Text = string.Join(" ", Utils.ConvertRoute(path!)) + " ";
         _stepsLabel.Content = (path!.Count - 1);
         _nodesLabel.Content = states.Count;
 
@@ -278,20 +275,76 @@ public partial class MainWindow : Window
         _solutionMatrix.SetPath(path);
     }
 
-    private void MazeSlider_OnPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+    private async void MazeSlider_OnPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
     {
         _mazeSlider = (sender as Slider)!;
         if (e.Property.Name != "Value" || _solutionMatrix is null ||
-            _solutionMatrix.States.Length == 0) return;
+            _solutionMatrix.States.Count == 0) return;
         var idx = (int)_mazeSlider.Value;
-        Coordinate? loc;
-        ClearCells();
+        await Dispatcher.UIThread.InvokeAsync(ClearCells);
 
-        if (idx >= _solutionMatrix.States.Length)
+        if (idx >= _solutionMatrix.States.Count)
         {
-            for (var i = 0; i < _solutionMatrix.Path.Length; i++)
+            await RenderPath();
+            return;
+        }
+
+        var state = _solutionMatrix.States[idx];
+        await RenderFootsteps(idx);
+        await RenderTreasures(state);
+
+        var loc = state.CurrentLocation;
+        await Dispatcher.UIThread.InvokeAsync(() => _cells[loc.Y, loc.X].Children
+            .Add(new Image { Source = _doraImage.Source, Height = _doraImage.Height }));
+    }
+
+    private async void PlayButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_solutionMatrix?.States.Count == 0 ||
+            Math.Abs(_mazeSlider.Value - _mazeSlider.Maximum) < double.Epsilon) return;
+        _isPlayed = true;
+
+        while (_isPlayed && _mazeSlider.Value < _mazeSlider.Maximum)
+        {
+            _mazeSlider.Value += 1;
+            await Task.Run(() => Thread.Sleep(100));
+        }
+
+        _isPlayed = false;
+    }
+
+    public void PauseButton_Click(object sender, RoutedEventArgs e)
+    {
+        _isPlayed = false;
+    }
+
+    private void ResetButton_Click(object sender, RoutedEventArgs e)
+    {
+        _isPlayed = false;
+        _mazeSlider.Value = 0;
+    }
+
+    private void ClearCells()
+    {
+        foreach (var p in _cells)
+        {
+            var filter = p.Children.Where(c =>
+                c is not Border && c is Image image && image.Source != _dirtImage.Source &&
+                image.Source != _grassImage.Source).ToList();
+            foreach (var c in filter)
             {
-                var (x, y) = (x: _solutionMatrix.Path[i].X, y: _solutionMatrix.Path[i].Y);
+                p.Children.Remove(c);
+            }
+        }
+    }
+
+    private async Task RenderPath()
+    {
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            for (var i = 0; i < _solutionMatrix!.Path.Count; i++)
+            {
+                var (x, y) = (_solutionMatrix.Path[i].X, _solutionMatrix.Path[i].Y);
                 int dir;
                 if (i > 0)
                 {
@@ -310,8 +363,10 @@ public partial class MainWindow : Window
                     Opacity = .5
                 });
             }
-
-            loc = _solutionMatrix.States[0].CurrentLocation;
+        });
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            var loc = _solutionMatrix!.States[0].CurrentLocation;
             _cells[loc.Y, loc.X].Children.Add(new Image
             {
                 Source = _doraImage.Source,
@@ -320,7 +375,10 @@ public partial class MainWindow : Window
                 VerticalAlignment = VerticalAlignment.Top,
                 Margin = new Thickness(_doraImage.Height * .04)
             });
-            foreach (var treasureLocation in _solutionMatrix.TreasureLocations)
+        });
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            foreach (var treasureLocation in _solutionMatrix!.TreasureLocations)
             {
                 _cells[treasureLocation.Y, treasureLocation.X].Children.Add(new Image
                 {
@@ -331,89 +389,54 @@ public partial class MainWindow : Window
                     Margin = new Thickness(_doraImage.Height * .05)
                 });
             }
+        });
+    }
 
-            return;
-        }
-
-        var state = _solutionMatrix.States[idx];
-        for (var i = 0; i < idx; i++)
+    private async Task RenderFootsteps(int states)
+    {
+        await Dispatcher.UIThread.InvokeAsync(() =>
         {
-            var st = _solutionMatrix.States[i];
-            loc = st.CurrentLocation;
-            _cells[loc.Y, loc.X].Children.Add(new Image
+            for (var i = 0; i < states; i++)
             {
-                Source = _footsteps.Source,
-                RenderTransform = new RotateTransform(90 * (int)st.Dir),
-                Width = _footsteps.Width,
-                Opacity = .5
-            });
-        }
-
-        foreach (var treasureLocation in _solutionMatrix.TreasureLocations)
-        {
-            var (x, y) = (x: treasureLocation.X, y: treasureLocation.Y);
-            if (state.IsVisited(treasureLocation) || state.IsBacktracked(treasureLocation) ||
-                state.IsSavedVisited(treasureLocation))
-            {
-                _cells[y, x].Children.Add(new Image
+                var st = _solutionMatrix!.States[i];
+                var loc = st.CurrentLocation;
+                _cells[loc.Y, loc.X].Children.Add(new Image
                 {
-                    Source = _openedTreasureImage.Source,
-                    Width = _openedTreasureImage.Width,
+                    Source = _footsteps.Source,
+                    RenderTransform = new RotateTransform(90 * (int)st.Dir),
+                    Width = _footsteps.Width,
+                    Opacity = .5
                 });
             }
-            else
+        });
+    }
+
+    private async Task RenderTreasures(CompressedState state)
+    {
+        await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                _cells[y, x].Children.Add(new Image
+                foreach (var treasureLocation in _solutionMatrix!.TreasureLocations)
                 {
-                    Source = _closedTreasureImage.Source,
-                    Width = _closedTreasureImage.Width,
-                });
+                    var (x, y) = (treasureLocation.X, treasureLocation.Y);
+                    if (state.IsVisited(treasureLocation) || state.IsBacktracked(treasureLocation) ||
+                        state.IsSavedVisited(treasureLocation))
+                    {
+                        _cells[y, x].Children.Add(new Image
+                        {
+                            Source = _openedTreasureImage.Source,
+                            Width = _openedTreasureImage.Width,
+                        });
+                    }
+                    else
+                    {
+                        _cells[y, x].Children.Add(new Image
+                        {
+                            Source = _closedTreasureImage.Source,
+                            Width = _closedTreasureImage.Width,
+                        });
+                    }
+                }
             }
-        }
-
-        loc = state.CurrentLocation;
-        _cells[loc.Y, loc.X].Children.Add(new Image { Source = _doraImage.Source, Height = _doraImage.Height });
-    }
-
-    private async void PlayButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (_solutionMatrix?.States.Length == 0 ||
-            Math.Abs(_mazeSlider.Value - _mazeSlider.Maximum) < double.Epsilon) return;
-        _isPlayed = true;
-
-        while (_isPlayed && _mazeSlider.Value < _mazeSlider.Maximum)
-        {
-            _mazeSlider.Value += 1;
-            await WorkAsync();
-        }
-
-        _isPlayed = false;
-    }
-
-    public void PauseButton_Click(object sender, RoutedEventArgs e)
-    {
-        _isPlayed = false;
-    }
-
-    private void ResetButton_Click(object sender, RoutedEventArgs e)
-    {
-        _isPlayed = false;
-        _mazeSlider.Value = 0;
-    }
-
-    private Task WorkAsync()
-    {
-        return !_isPlayed ? Task.CompletedTask : Task.Run(() => { Thread.Sleep(200); });
-    }
-
-    private void ClearCells()
-    {
-        foreach (var p in _cells)
-        {
-            foreach (var c in p.Children.Where(c => c is not Border).ToList())
-            {
-                p.Children.Remove(c);
-            }
-        }
+        );
     }
 }

@@ -6,57 +6,57 @@ public class SolutionMatrix
 {
     public readonly int Width;
     public readonly int Height;
-    private readonly List<Coordinate> _path;
-    private readonly List<Cell> _cells;
-    private readonly List<CompressedState> _states;
-    private readonly List<Coordinate> _treasureLocations;
+    public readonly List<Coordinate> Path;
+    public readonly List<Cell> Cells;
+    public readonly List<CompressedState> States;
+    public readonly List<Coordinate> TreasureLocations;
 
-    public IEnumerable<Cell> Cells => _cells.ToArray();
-    public CompressedState[] States => _states.ToArray();
-    public Coordinate[] TreasureLocations => _treasureLocations.ToArray();
-    public Coordinate[] Path => _path.ToArray();
+    // public IEnumerable<Cell> Cells => _cells.ToArray();
+    // public CompressedState[] States => _states.ToArray();
+    // public Coordinate[] TreasureLocations => _treasureLocations.ToArray();
+    // public Coordinate[] Path => _path.ToArray();
 
     public SolutionMatrix(int width, int height)
     {
-        _states = new List<CompressedState>();
-        _treasureLocations = new List<Coordinate>();
-        _cells = new List<Cell>();
-        _path = new List<Coordinate>();
+        States = new List<CompressedState>();
+        TreasureLocations = new List<Coordinate>();
+        Cells = new List<Cell>();
+        Path = new List<Coordinate>();
         Width = width;
         Height = height;
     }
 
     public void AddState(CompressedState state)
     {
-        _states.Add(state);
+        States.Add(state);
     }
 
     public void AddTreasureLocation(Coordinate coordinate)
     {
-        _treasureLocations.Add(coordinate);
+        TreasureLocations.Add(coordinate);
     }
 
     public void AddCell(Cell cell)
     {
-        _cells.Add(cell);
+        Cells.Add(cell);
     }
 
     public void SetStates(IEnumerable<CompressedState> states)
     {
-        _states.Clear();
-        _states.AddRange(states);
+        States.Clear();
+        States.AddRange(states);
     }
 
     public void SetPath(IEnumerable<Coordinate> path)
     {
-        _path.Clear();
-        _path.AddRange(path);
+        Path.Clear();
+        Path.AddRange(path);
     }
 
     public void Clear()
     {
-        _states.Clear();
-        _treasureLocations.Clear();
-        _cells.Clear();
+        States.Clear();
+        TreasureLocations.Clear();
+        Cells.Clear();
     }
 }
