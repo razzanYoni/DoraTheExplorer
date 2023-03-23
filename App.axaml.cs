@@ -5,7 +5,7 @@ using DoraTheExplorer.Views;
 
 namespace DoraTheExplorer;
 
-public partial class App : Application
+public class App : Application
 {
     public override void Initialize()
     {

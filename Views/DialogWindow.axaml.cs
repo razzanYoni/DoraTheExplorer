@@ -3,22 +3,15 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
-namespace Tubes2_DoraTheExplorer.Views;
+namespace DoraTheExplorer.Views;
 
 public partial class DialogWindow : Window
 {
-    private string _message;
-    
-    public DialogWindow()
-    {
-        InitializeComponent();
-    }
     public DialogWindow(string message)
     {
         InitializeComponent();
-        _message = message;
         var textBlock = this.FindControl<TextBlock>("MessageTextBlock");
-        textBlock.Text = _message;
+        textBlock.Text = message;
         var alertButton = this.FindControl<Button>("AlertButton");
         alertButton.Click += AlertButton_OnClick;
 #if DEBUG
@@ -33,6 +26,6 @@ public partial class DialogWindow : Window
 
     private void AlertButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        this.Close();
+        Close();
     }
 }

@@ -17,7 +17,6 @@ using Avalonia.Platform;
 using DoraTheExplorer.Algorithm;
 using DoraTheExplorer.Structure;
 using DoraTheExplorer.Util;
-using Tubes2_DoraTheExplorer.Views;
 
 // ReSharper disable UnusedParameter.Local
 
