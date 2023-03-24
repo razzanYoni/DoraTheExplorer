@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Avalonia.Media;
 using DoraTheExplorer.Structure;
 
@@ -103,6 +105,10 @@ public static class Utils
                 case Direction.Right:
                     res.Add('\uf0a9');
                     break;
+                case Direction.Unknown:
+                    break;
+                default:
+                    throw new UnreachableException("gak mungkin masuk sini lah, lu ngapain sih?");
             }
         }
         return res;

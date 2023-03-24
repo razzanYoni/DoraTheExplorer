@@ -389,8 +389,7 @@ public partial class MainWindow : Window
                 foreach (var treasureLocation in _solutionMatrix!.TreasureLocations)
                 {
                     var (x, y) = (treasureLocation.X, treasureLocation.Y);
-                    if (state.IsVisited(treasureLocation) || state.IsBacktracked(treasureLocation) ||
-                        state.IsSavedVisited(treasureLocation))
+                    if (state.IsVisited(treasureLocation) || state.IsSavedVisited(treasureLocation))
                     {
                         _cells[y, x].Children.Add(new Image
                         {

@@ -156,7 +156,7 @@ public static class DfsSolver
         Stack<List<Coordinate>> track, CompressedState state, char direction, ref bool blocked)
     {
         var neighbour = v.GetNeighbour(direction);
-        if (neighbour is null || state.IsVisited(neighbour.Info) || state.IsBacktracked(neighbour.Info)) return;
+        if (neighbour is null || state.IsVisited(neighbour.Info)) return;
         q.Push(neighbour);
         var curTrack = new List<Coordinate>(t);
         if (curTrack.Count > 1 && curTrack[^2].Equals(neighbour.Info))
