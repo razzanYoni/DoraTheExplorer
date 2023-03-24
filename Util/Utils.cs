@@ -20,6 +20,7 @@ public static class Utils
     public static (SolutionMatrix?, Graph<Coordinate>?, bool) ReadFile(string path)
     {
         int countStart = 0;
+        int countTreasure = 0;
         string[] lines = System.IO.File.ReadAllLines(path);
         int row = lines.Length;
         int col = lines[0].Replace(" ", "").Length;
@@ -72,6 +73,7 @@ public static class Utils
                     if (lines[i][j] == 'T')
                     {
                         solutionMatrix.AddTreasureLocation(new Coordinate(j, i));
+                        ++countTreasure;
                     }
 
                     graph.AddVertex(vertices[i, j]);
@@ -83,7 +85,7 @@ public static class Utils
             }
         }
 
-        return (solutionMatrix, graph, countStart == 1);
+        return (solutionMatrix, graph, (countStart == 1) && (countTreasure > 0));
     }
 
     public static IEnumerable<char> ConvertRoute(List<Coordinate> route)
