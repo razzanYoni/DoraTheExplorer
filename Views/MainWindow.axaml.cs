@@ -251,7 +251,7 @@ public partial class MainWindow : Window
         _solutionMatrix.SetStates(states);
         _solutionMatrix.SetPath(path);
         _mazeSlider.SetValue(RangeBase.MaximumProperty, states.Count);
-        _mazeSlider.SetValue(RangeBase.ValueProperty, 0);
+        _mazeSlider.SetValue(RangeBase.ValueProperty, states.Count);
     }
 
     private async void MazeSlider_OnPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
