@@ -225,41 +225,20 @@ public partial class MainWindow : Window
 
         List<Coordinate>? path;
         List<CompressedState>? states;
+        _solutionMatrix.Path.Clear();
 
         var watch = Stopwatch.StartNew();
         watch.Start();
 
-        if (_tspCheckBox.IsChecked == true)
+        if (_bfsRadioButton.IsChecked == true)
         {
-            if (_bfsRadioButton.IsChecked == true)
-            {
-                Debug.WriteLine("Eksekusi bfs dengan tsp \n");
-                (path, states) = await Task.Run(() => BfsSolver.FindPath(_graph, _solutionMatrix.States.First(),
-                    _solutionMatrix.TreasureLocations, true));
-            }
-            else
-            {
-                Debug.WriteLine("Eksekusi dfs dengan tsp \n");
-
-                (path, states) = await Task.Run(() => DfsSolver.FindPath(_graph, _solutionMatrix.States.First(),
-                    _solutionMatrix.TreasureLocations, true));
-            }
+            (path, states) = await Task.Run(() => BfsSolver.FindPath(_graph, _solutionMatrix.States.First(),
+                _solutionMatrix.TreasureLocations, _tspCheckBox.IsChecked != null && _tspCheckBox.IsChecked.Value));
         }
         else
         {
-            if (_bfsRadioButton.IsChecked == true)
-            {
-                Debug.WriteLine("Eksekusi bfs tanpa tsp \n");
-                (path, states) = await Task.Run(() => BfsSolver.FindPath(_graph, _solutionMatrix.States.First(),
-                    _solutionMatrix.TreasureLocations));
-            }
-            else
-            {
-                Debug.WriteLine("Eksekusi dfs tanpa tsp \n");
-
-                (path, states) = await Task.Run(() => DfsSolver.FindPath(_graph, _solutionMatrix.States.First(),
-                    _solutionMatrix.TreasureLocations));
-            }
+            (path, states) = await Task.Run(() => DfsSolver.FindPath(_graph, _solutionMatrix.States.First(),
+                _solutionMatrix.TreasureLocations, _tspCheckBox.IsChecked != null && _tspCheckBox.IsChecked.Value));
         }
 
         watch.Stop();
@@ -269,10 +248,10 @@ public partial class MainWindow : Window
         _stepsLabel.Content = (path!.Count - 1);
         _nodesLabel.Content = states.Count;
 
-        _mazeSlider.Maximum = states.Count;
-        _mazeSlider.Value = 0;
         _solutionMatrix.SetStates(states);
         _solutionMatrix.SetPath(path);
+        _mazeSlider.SetValue(RangeBase.MaximumProperty, states.Count);
+        _mazeSlider.SetValue(RangeBase.ValueProperty, 0);
     }
 
     private async void MazeSlider_OnPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
@@ -281,11 +260,11 @@ public partial class MainWindow : Window
         if (e.Property.Name != "Value" || _solutionMatrix is null ||
             _solutionMatrix.States.Count == 0) return;
         var idx = (int)_mazeSlider.Value;
-        await Dispatcher.UIThread.InvokeAsync(ClearCells);
+        ClearCells();
 
         if (idx >= _solutionMatrix.States.Count)
         {
-            await RenderPath();
+            RenderPath();
             return;
         }
 
@@ -338,58 +317,50 @@ public partial class MainWindow : Window
         }
     }
 
-    private async Task RenderPath()
+    private void RenderPath()
     {
-        await Dispatcher.UIThread.InvokeAsync(() =>
+        for (var i = 0; i < _solutionMatrix!.Path.Count; i++)
         {
-            for (var i = 0; i < _solutionMatrix!.Path.Count; i++)
+            var (x, y) = (_solutionMatrix.Path[i].X, _solutionMatrix.Path[i].Y);
+            int dir;
+            if (i > 0)
             {
-                var (x, y) = (_solutionMatrix.Path[i].X, _solutionMatrix.Path[i].Y);
-                int dir;
-                if (i > 0)
-                {
-                    dir = (int)Utils.DetermineDirection(_solutionMatrix.Path[i - 1], _solutionMatrix.Path[i]);
-                }
-                else
-                {
-                    dir = (int)Utils.DetermineDirection(_solutionMatrix.Path[0], _solutionMatrix.Path[1]);
-                }
-
-                _cells[y, x].Children.Add(new Image
-                {
-                    Source = _footsteps.Source,
-                    RenderTransform = new RotateTransform(90 * dir),
-                    Width = _footsteps.Width,
-                    Opacity = .5
-                });
+                dir = (int)Utils.DetermineDirection(_solutionMatrix.Path[i - 1], _solutionMatrix.Path[i]);
             }
-        });
-        await Dispatcher.UIThread.InvokeAsync(() =>
-        {
-            var loc = _solutionMatrix!.States[0].CurrentLocation;
-            _cells[loc.Y, loc.X].Children.Add(new Image
+            else
             {
-                Source = _doraImage.Source,
-                Height = _doraImage.Height * .4,
+                dir = (int)Utils.DetermineDirection(_solutionMatrix.Path[0], _solutionMatrix.Path[1]);
+            }
+
+            _cells[y, x].Children.Add(new Image
+            {
+                Source = _footsteps.Source,
+                RenderTransform = new RotateTransform(90 * dir),
+                Width = _footsteps.Width,
+                Opacity = .5
+            });
+        }
+
+        var loc = _solutionMatrix!.States[0].CurrentLocation;
+        _cells[loc.Y, loc.X].Children.Add(new Image
+        {
+            Source = _doraImage.Source,
+            Height = _doraImage.Height * .4,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment = VerticalAlignment.Top,
+            Margin = new Thickness(_doraImage.Height * .04)
+        });
+        foreach (var treasureLocation in _solutionMatrix!.TreasureLocations)
+        {
+            _cells[treasureLocation.Y, treasureLocation.X].Children.Add(new Image
+            {
+                Source = _openedTreasureImage.Source,
+                Width = _openedTreasureImage.Width * .5,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Top,
-                Margin = new Thickness(_doraImage.Height * .04)
+                Margin = new Thickness(_doraImage.Height * .05)
             });
-        });
-        await Dispatcher.UIThread.InvokeAsync(() =>
-        {
-            foreach (var treasureLocation in _solutionMatrix!.TreasureLocations)
-            {
-                _cells[treasureLocation.Y, treasureLocation.X].Children.Add(new Image
-                {
-                    Source = _openedTreasureImage.Source,
-                    Width = _openedTreasureImage.Width * .5,
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    VerticalAlignment = VerticalAlignment.Top,
-                    Margin = new Thickness(_doraImage.Height * .05)
-                });
-            }
-        });
+        }
     }
 
     private async Task RenderFootsteps(int states)

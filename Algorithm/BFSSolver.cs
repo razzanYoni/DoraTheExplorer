@@ -54,8 +54,8 @@ public static class BfsSolver
     }
 
     public static (List<Coordinate>?, List<CompressedState>) FindPath(Graph<Coordinate> graph,
-        CompressedState initialState,
-        IEnumerable<Coordinate> goals, bool tsp = false)
+        CompressedState initialState, IEnumerable<Coordinate> goals, bool tsp = false,
+        string directionPriority = "RDLU")
     {
         var start = initialState.CurrentLocation;
         var state = new CompressedState(initialState);
@@ -65,11 +65,12 @@ public static class BfsSolver
         while (goalSet.Count > 0)
         {
             var shortestGoal = goalSet[0];
-            var (shortestPath, shortestStates) = FindPath(graph, new CompressedState(state), shortestGoal);
+            var (shortestPath, shortestStates) =
+                FindPath(graph, new CompressedState(state), shortestGoal, directionPriority);
             for (var i = 1; i < goalSet.Count; i++)
             {
                 var goal = goalSet[i];
-                var (path, states) = FindPath(graph, new CompressedState(state), goal);
+                var (path, states) = FindPath(graph, new CompressedState(state), goal, directionPriority);
                 if (states.Count >= shortestStates.Count) continue;
                 shortestPath = path;
                 shortestStates = states;
@@ -84,8 +85,8 @@ public static class BfsSolver
 
         if (tsp)
         {
-            state.RemoveVisitedLocation(start);
-            var (path, states) = FindPath(graph, new CompressedState(state), start);
+            var revDir = new string(directionPriority.Reverse().ToArray());
+            var (path, states) = FindPath(graph, new CompressedState(state), start, revDir);
             if (path is not null) paths.Add(path);
             statesList.Add(states);
         }
@@ -98,8 +99,7 @@ public static class BfsSolver
     }
 
     public static (List<Coordinate>?, List<CompressedState>) FindPath(Graph<Coordinate> graph,
-        CompressedState initialState,
-        Coordinate goal)
+        CompressedState initialState, Coordinate goal, string directionPriority)
     {
         var states = new List<CompressedState>();
         var state = new CompressedState(initialState);
@@ -113,7 +113,6 @@ public static class BfsSolver
         t.Add(v.Info);
         track.Enqueue(new List<Coordinate>(t));
         // backtrack
-        var backtrack = false;
         while (q.Count > 0)
         {
             v = q.Dequeue();
@@ -137,54 +136,17 @@ public static class BfsSolver
             }
 
             var blocked = true;
-            if (v.Right is not null && !state.IsVisited(v.Right.Info) && !state.IsBacktracked(v.Right.Info))
+            foreach (var dir in directionPriority)
             {
-                var curTrack = new List<Coordinate>(t);
-                q.Enqueue(v.Right);
-                curTrack.Add(v.Right.Info);
-                track.Enqueue(curTrack);
-                blocked = false;
-            }
-
-            if (v.Down is not null && !state.IsVisited(v.Down.Info) && !state.IsBacktracked(v.Down.Info))
-            {
-                var curTrack = new List<Coordinate>(t);
-                q.Enqueue(v.Down);
-                curTrack.Add(v.Down.Info);
-                track.Enqueue(curTrack);
-                blocked = false;
-            }
-
-            if (v.Left is not null && !state.IsVisited(v.Left.Info) && !state.IsBacktracked(v.Left.Info))
-            {
-                var curTrack = new List<Coordinate>(t);
-                q.Enqueue(v.Left);
-                curTrack.Add(v.Left.Info);
-                track.Enqueue(curTrack);
-                blocked = false;
-            }
-
-            if (v.Up is not null && !state.IsVisited(v.Up.Info) && !state.IsBacktracked(v.Up.Info))
-            {
-                var curTrack = new List<Coordinate>(t);
-                q.Enqueue(v.Up);
-                curTrack.Add(v.Up.Info);
-                track.Enqueue(curTrack);
-                blocked = false;
+                Seek(v, q, t, track, state, dir, ref blocked);
             }
 
             if (blocked && q.Count == 0)
             {
-                state.RemoveLatestVisitedLocation();
+                state.SaveAllVisitedLocations();
+                state.ClearVisitedLocations();
                 q.Enqueue(v);
                 track.Enqueue(t);
-                backtrack = true;
-            }
-            else if (backtrack)
-            {
-                states.Add(new CompressedState(state));
-                state.AddBacktrackLocation(v.Info);
-                backtrack = false;
             }
             else
             {
@@ -195,5 +157,25 @@ public static class BfsSolver
 
         states[0].Dir = states[1].Dir;
         return (path.Count > 0 ? path : null, states);
+    }
+
+    private static void Seek(Vertex<Coordinate> v, Queue<Vertex<Coordinate>> q, IEnumerable<Coordinate> t,
+        Queue<List<Coordinate>> track, CompressedState state, char direction, ref bool blocked)
+    {
+        var neighbour = v.GetNeighbour(direction);
+        if (neighbour is null || state.IsVisited(neighbour.Info) || state.IsBacktracked(neighbour.Info)) return;
+        q.Enqueue(neighbour);
+        var curTrack = new List<Coordinate>(t);
+        if (curTrack.Count > 1 && curTrack[^2].Equals(neighbour.Info))
+        {
+            curTrack.Remove(curTrack.Last());
+        }
+        else
+        {
+            curTrack.Add(neighbour.Info);
+        }
+
+        track.Enqueue(curTrack);
+        blocked = false;
     }
 }

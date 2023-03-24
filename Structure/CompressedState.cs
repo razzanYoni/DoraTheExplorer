@@ -82,6 +82,22 @@ public class CompressedState
         AddSavedVisitedLocation(coordinate);
     }
 
+    public void SaveAllVisitedLocations()
+    {
+        for (var i = 0; i < _visitedLocations.Length; i++)
+        {
+            _savedVisitedLocations[i] |= _visitedLocations[i];
+        }
+    }
+
+    public void ClearVisitedLocations()
+    {
+        for (var i = 0; i < _savedVisitedLocations.Length; i++)
+        {
+            _visitedLocations[i] = 0;
+        }
+    }
+
     public bool IsBacktracked(Coordinate coordinate)
     {
         var (idx, bit) = Calculate(coordinate);

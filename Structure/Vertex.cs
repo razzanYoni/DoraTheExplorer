@@ -58,4 +58,16 @@ public class Vertex<T>
         _down = down;
         down._up = this;
     }
+
+    public Vertex<T>? GetNeighbour(char direction)
+    {
+        return char.ToLower(direction) switch
+        {
+            'l' => _left,
+            'u' => _up,
+            'r' => _right,
+            'd' => _down,
+            _ => null
+        };
+    }
 }
